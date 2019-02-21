@@ -249,17 +249,15 @@ void AI::move(World *world)
 */
 }
 //Moghe Commit Comment Beshe ................
-Cell heroLocator(World *world,int ID)
+Cell heroLocator(World *world, int ID)
 {
     return world->getHero(ID).getCurrentCell();
 }
-Cell cellLocator(World *world,int i,int j)
+Cell cellLocator(World *world, int i, int j)
 {
-    return world->map().getCell(i,j);
+    return world->map().getCell(i, j);
 }
 //...........................................
-
-
 
 void AI::action(World *world)
 {
@@ -350,6 +348,106 @@ void AI::action(World *world)
                         world->manhattanDistance(heroLocator(world, SENTRY_ID), cellLocator(world, i, j)) <= 7)
                     {
                         world->castAbility(world->getHero(SENTRY_ID), world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_ATTACK), mapAnalyse[i][j]);
+                        break;
+                    }
+                }
+            }
+        }
+        //....................................Blaster_Bomb..........................
+        else if (world->getMyHeroes()[k]->getId() == BLASTER_ID)
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                for (int j = 0; j < 32; j++)
+                {
+                    if (AbilityConstants.getName()::BLASTER_BOMB.getCooldown() == 0 &&
+                            (mapAnalyse[i][j] != -1) &&
+                            world->map().getCell(i, j).isInVision() &&
+                            HERO_mapAnalyse[i][j] == 2 &&
+                            world->manhattanDistance(heroLocator(world, BLASTER_ID), cellLocator(world, i, j)) = 5)
+
+                    // Sharte dg baraye inke agar 2 ya chandta hero doshman too ye nahie be fasele 2 boodan biyad bezane
+                    //Olaviat ba bala e
+
+                    {
+                        world->castAbility(world->getHero(BLASTER_ID), world->getHero(BLASTER_ID).getAbility(AbilityName::BLASTER_BOMB), mapAnalyse[i][j]);
+                        break;
+                    }
+                    if (AbilityConstants.getName()::BLASTER_BOMB.getCooldown() == 0 &&
+                            (mapAnalyse[i][j] != -1) &&
+                            world->map().getCell(i, j).isInVision() &&
+                            HERO_mapAnalyse[i][j] == 3 &&
+                            world->manhattanDistance(heroLocator(world, BLASTER_ID), cellLocator(world, i, j)) = 5)
+
+                    // Sharte dg baraye inke agar 2 ya chandta hero doshman too ye nahie be fasele 2 boodan biyad bezane
+                    //Olaviat ba bala e
+
+                    {
+                        world->castAbility(world->getHero(BLASTER_ID), world->getHero(BLASTER_ID).getAbility(AbilityName::BLASTER_BOMB), mapAnalyse[i][j]);
+                        break;
+                    }
+                    if (AbilityConstants.getName()::BLASTER_BOMB.getCooldown() == 0 &&
+                            (mapAnalyse[i][j] != -1) &&
+                            world->map().getCell(i, j).isInVision() &&
+                            HERO_mapAnalyse[i][j] == 4 &&
+                            world->manhattanDistance(heroLocator(world, BLASTER_ID), cellLocator(world, i, j)) = 5)
+
+                    // Sharte dg baraye inke agar 2 ya chandta hero doshman too ye nahie be fasele 2 boodan biyad bezane
+                    //Olaviat ba bala e
+
+                    {
+                        world->castAbility(world->getHero(BLASTER_ID), world->getHero(BLASTER_ID).getAbility(AbilityName::BLASTER_BOMB), mapAnalyse[i][j]);
+                        break;
+                    }
+                    if (AbilityConstants.getName()::BLASTER_BOMB.getCooldown() == 0 &&
+                            (mapAnalyse[i][j] != -1) &&
+                            world->map().getCell(i, j).isInVision() &&
+                            HERO_mapAnalyse[i][j] == 5 &&
+                            world->manhattanDistance(heroLocator(world, BLASTER_ID), cellLocator(world, i, j)) = 5)
+
+                    // Sharte dg baraye inke agar 2 ya chandta hero doshman too ye nahie be fasele 2 boodan biyad bezane
+                    //Olaviat ba bala e
+
+                    {
+                        world->castAbility(world->getHero(BLASTER_ID), world->getHero(BLASTER_ID).getAbility(AbilityName::BLASTER_BOMB), mapAnalyse[i][j]);
+                        break;
+                    }
+                    //..............................BLASTER_BOMB.....................................
+                    //..............................BLASTER_ATTACK...................................
+                    if (AbilityConstants.getName()::BLASTER_ATTACK.getCooldown() == 0 &&
+                        (mapAnalyse[i][j] != -1) &&
+                        world->map().getCell(i, j).isInVision() &&
+                        HERO_mapAnalyse[i][j] == 2 &&
+                        world->manhattanDistance(heroLocator(world, BLASTER_ID), cellLocator(world, i, j)) <= 4)
+                    {
+                        world->castAbility(world->getHero(BLASTER_ID), world->getHero(BLASTER_ID).getAbility(AbilityName::BLASTER_ATTACK), mapAnalyse[i][j]);
+                        break;
+                    }
+                    if (AbilityConstants.getName()::BLASTER_ATTACK.getCooldown() == 0 &&
+                        (mapAnalyse[i][j] != -1) &&
+                        world->map().getCell(i, j).isInVision() &&
+                        HERO_mapAnalyse[i][j] == 3 &&
+                        world->manhattanDistance(heroLocator(world, BLASTER_ID), cellLocator(world, i, j)) <= 4)
+                    {
+                        world->castAbility(world->getHero(BLASTER_ID), world->getHero(BLASTER_ID).getAbility(AbilityName::BLASTER_ATTACK), mapAnalyse[i][j]);
+                        break;
+                    }
+                    if (AbilityConstants.getName()::BLASTER_ATTACK.getCooldown() == 0 &&
+                        (mapAnalyse[i][j] != -1) &&
+                        world->map().getCell(i, j).isInVision() &&
+                        HERO_mapAnalyse[i][j] == 4 &&
+                        world->manhattanDistance(heroLocator(world, BLASTER_ID), cellLocator(world, i, j)) <= 4)
+                    {
+                        world->castAbility(world->getHero(BLASTER_ID), world->getHero(BLASTER_ID).getAbility(AbilityName::BLASTER_ATTACK), mapAnalyse[i][j]);
+                        break;
+                    }
+                    if (AbilityConstants.getName()::BLASTER_ATTACK.getCooldown() == 0 &&
+                        (mapAnalyse[i][j] != -1) &&
+                        world->map().getCell(i, j).isInVision() &&
+                        HERO_mapAnalyse[i][j] == 5 &&
+                        world->manhattanDistance(heroLocator(world, BLASTER_ID), cellLocator(world, i, j)) <= 4)
+                    {
+                        world->castAbility(world->getHero(BLASTER_ID), world->getHero(BLASTER_ID).getAbility(AbilityName::BLASTER_ATTACK), mapAnalyse[i][j]);
                         break;
                     }
                 }
