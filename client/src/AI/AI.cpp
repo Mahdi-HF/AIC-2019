@@ -266,82 +266,91 @@ void AI::action(World *world)
     cerr << "-action" << endl;
 
     //................................... Action Sentry_Ray.................................
-    for (int i = 0; i < 4; i++)
+    for (int k = 0; k < 4; k++)
     {
-        if (world->getMyHeroes()[i]->getId() == SENTRY_ID)
+        if (world->getMyHeroes()[k]->getId() == SENTRY_ID)
         {
-            if (AbilityConstants.getName()::SENTRY_RAY.getCooldown == 0)
+            for (int i = 0; i < 32; i++)
             {
-                for (int i = 0; i < 32; i++)
+                for (int j = 0; j < 32; j++)
                 {
-                    for (int j = 0; j < 32; j++)
+                    //................................... Action Sentry_Ray.................................
+                    if (AbilityConstants.getName()::SENTRY_RAY.getCooldown() == 0 &&
+                        (mapAnalyse[i][j] != -1) &&
+                        world->map().getCell(i, j).isInVision() &&
+                        HERO_mapAnalyse[i][j] == 2 &&
+                        world->manhattanDistance(heroLocator(world, SENTRY_ID), cellLocator(world, i, j)) > 7)
                     {
-                        if ((mapAnalyse[i][j] != -1) &&
-                            world->map().getCell(i, j).isInVision() &&
-                            HERO_mapAnalyse[i][j] == 2 &&
-                            world->manhattanDistance(heroLocator(world,SENTRY_ID),cellLocator(world,i,j))>7)
-                        {
-                            world->castAbility(world->getHero(SENTRY_ID),world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_RAY),mapAnalyse[i][j]);
-                            break;
-                        }
-                        else if ((mapAnalyse[i][j] != -1) &&
-                            world->map().getCell(i, j).isInVision() &&
-                            HERO_mapAnalyse[i][j] == 3 &&
-                            world->manhattanDistance(heroLocator(world,SENTRY_ID),cellLocator(world,i,j))>7)
-                        {
-                            world->castAbility(world->getHero(SENTRY_ID),world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_RAY),mapAnalyse[i][j]);
-                            break;
-                        }
-                        else if ((mapAnalyse[i][j] != -1) &&
-                            world->map().getCell(i, j).isInVision() &&
-                            HERO_mapAnalyse[i][j] == 4 &&
-                            world->manhattanDistance(heroLocator(world,SENTRY_ID),cellLocator(world,i,j))>7)
-                        {
-                            world->castAbility(world->getHero(SENTRY_ID),world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_RAY),mapAnalyse[i][j]);
-                            break;
-                        }
-                        else if ((mapAnalyse[i][j] != -1) &&
-                            world->map().getCell(i, j).isInVision() &&
-                            HERO_mapAnalyse[i][j] == 5 &&
-                            world->manhattanDistance(heroLocator(world,SENTRY_ID),cellLocator(world,i,j))>7)
-                        {
-                            world->castAbility(world->getHero(SENTRY_ID),world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_RAY),mapAnalyse[i][j]);
-                            break;
-                        }
-                        //.......................................................................................
-                        else if ((mapAnalyse[i][j] != -1) &&
-                            world->map().getCell(i, j).isInVision() &&
-                            HERO_mapAnalyse[i][j] == 2 &&
-                            world->manhattanDistance(heroLocator(world,SENTRY_ID),cellLocator(world,i,j))<=7)
-                        {
-                            world->castAbility(world->getHero(SENTRY_ID),world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_ATTACK),mapAnalyse[i][j]);
-                            break;
-                        }
-                        else if ((mapAnalyse[i][j] != -1) &&
-                            world->map().getCell(i, j).isInVision() &&
-                            HERO_mapAnalyse[i][j] == 3 &&
-                            world->manhattanDistance(heroLocator(world,SENTRY_ID),cellLocator(world,i,j))<=7)
-                        {
-                            world->castAbility(world->getHero(SENTRY_ID),world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_ATTACK),mapAnalyse[i][j]);
-                            break;
-                        }
-                        else if ((mapAnalyse[i][j] != -1) &&
-                            world->map().getCell(i, j).isInVision() &&
-                            HERO_mapAnalyse[i][j] == 4 &&
-                            world->manhattanDistance(heroLocator(world,SENTRY_ID),cellLocator(world,i,j))<=7)
-                        {
-                            world->castAbility(world->getHero(SENTRY_ID),world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_ATTACK),mapAnalyse[i][j]);
-                            break;
-                        }
-                        else if ((mapAnalyse[i][j] != -1) &&
-                            world->map().getCell(i, j).isInVision() &&
-                            HERO_mapAnalyse[i][j] == 5 &&
-                            world->manhattanDistance(heroLocator(world,SENTRY_ID),cellLocator(world,i,j))<=7)
-                        {
-                            world->castAbility(world->getHero(SENTRY_ID),world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_ATTACK),mapAnalyse[i][j]);
-                            break;
-                        }
-                        //.....................................................................................
+                        world->castAbility(world->getHero(SENTRY_ID), world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_RAY), mapAnalyse[i][j]);
+                        break;
+                    }
+
+                    if (AbilityConstants.getName()::SENTRY_RAY.getCooldown() == 0 &&
+                        (mapAnalyse[i][j] != -1) &&
+                        world->map().getCell(i, j).isInVision() &&
+                        HERO_mapAnalyse[i][j] == 3 &&
+                        world->manhattanDistance(heroLocator(world, SENTRY_ID), cellLocator(world, i, j)) > 7)
+                    {
+                        world->castAbility(world->getHero(SENTRY_ID), world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_RAY), mapAnalyse[i][j]);
+                        break;
+                    }
+
+                    if (AbilityConstants.getName()::SENTRY_RAY.getCooldown() == 0 &&
+                        (mapAnalyse[i][j] != -1) &&
+                        world->map().getCell(i, j).isInVision() &&
+                        HERO_mapAnalyse[i][j] == 4 &&
+                        world->manhattanDistance(heroLocator(world, SENTRY_ID), cellLocator(world, i, j)) > 7)
+                    {
+                        world->castAbility(world->getHero(SENTRY_ID), world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_RAY), mapAnalyse[i][j]);
+                        break;
+                    }
+
+                    if (AbilityConstants.getName()::SENTRY_RAY.getCooldown() == 0 &&
+                        (mapAnalyse[i][j] != -1) &&
+                        world->map().getCell(i, j).isInVision() &&
+                        HERO_mapAnalyse[i][j] == 5 &&
+                        world->manhattanDistance(heroLocator(world, SENTRY_ID), cellLocator(world, i, j)) > 7)
+                    {
+                        world->castAbility(world->getHero(SENTRY_ID), world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_RAY), mapAnalyse[i][j]);
+                        break;
+                    }
+                    //................................... Action Sentry_Ray.................................
+                    //................................... Action Sentry_ATTACK.................................
+                    if (AbilityConstants.getName()::SENTRY_ATTACK.Cooldown() == 0 &&
+                        (mapAnalyse[i][j] != -1) &&
+                        world->map().getCell(i, j).isInVision() &&
+                        HERO_mapAnalyse[i][j] == 2 &&
+                        world->manhattanDistance(heroLocator(world, SENTRY_ID), cellLocator(world, i, j)) <= 7)
+                    {
+                        world->castAbility(world->getHero(SENTRY_ID), world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_ATTACK), mapAnalyse[i][j]);
+                        break;
+                    }
+                    if (AbilityConstants.getName()::SENTRY_ATTACK.Cooldown() == 0 &&
+                        (mapAnalyse[i][j] != -1) &&
+                        world->map().getCell(i, j).isInVision() &&
+                        HERO_mapAnalyse[i][j] == 3 &&
+                        world->manhattanDistance(heroLocator(world, SENTRY_ID), cellLocator(world, i, j)) <= 7)
+                    {
+                        world->castAbility(world->getHero(SENTRY_ID), world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_ATTACK), mapAnalyse[i][j]);
+                        break;
+                    }
+                    if (AbilityConstants.getName()::SENTRY_ATTACK.Cooldown() == 0 &&
+                        (mapAnalyse[i][j] != -1) &&
+                        world->map().getCell(i, j).isInVision() &&
+                        HERO_mapAnalyse[i][j] == 4 &&
+                        world->manhattanDistance(heroLocator(world, SENTRY_ID), cellLocator(world, i, j)) <= 7)
+                    {
+                        world->castAbility(world->getHero(SENTRY_ID), world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_ATTACK), mapAnalyse[i][j]);
+                        break;
+                    }
+                    if (AbilityConstants.getName()::SENTRY_ATTACK.Cooldown() == 0 &&
+                        (mapAnalyse[i][j] != -1) &&
+                        world->map().getCell(i, j).isInVision() &&
+                        HERO_mapAnalyse[i][j] == 5 &&
+                        world->manhattanDistance(heroLocator(world, SENTRY_ID), cellLocator(world, i, j)) <= 7)
+                    {
+                        world->castAbility(world->getHero(SENTRY_ID), world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_ATTACK), mapAnalyse[i][j]);
+                        break;
                     }
                 }
             }
