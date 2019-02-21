@@ -301,13 +301,11 @@ void AI::move(World *world)
 */
 }
 
-
-//----------------------------------------- Action -----------------------------------------------------------------------
+//----------------------------------------- Action ---------------------------------------------------------------------
 void AI::action(World *world)
 {
     cerr << "-action" << endl;
 
-    //................................... Action Sentry_Ray.................................
     for (int k = 0; k < 4; k++)
     {
         if (world->getMyHeroes()[k]->getId() == SENTRY_ID)
@@ -316,6 +314,7 @@ void AI::action(World *world)
             {
                 for (int j = 0; j < 32; j++)
                 {
+                    //...................................  Sentry_Ray.................................
                     if (world->getHero(SENTRY_ID).getAbility(SENTRY_RAY).getCooldown() == 0 and
                         (mapAnalyse[i][j] != -1) and
                         world->map().getCell(i, j).isInVision() and
@@ -338,14 +337,14 @@ void AI::action(World *world)
                 }
             }
         }
-        //....................................Blaster_Bomb..........................
+
         else if (world->getMyHeroes()[k]->getId() == BLASTER_ID)
         {
             for (int i = 0; i < 32; i++)
             {
                 for (int j = 0; j < 32; j++)
                 {
-
+                    //.................................... Blaster_Bomb ..........................
                     if (world->getHero(BLASTER_ID).getAbility(BLASTER_BOMB).getCooldown() == 0 and
                         (mapAnalyse[i][j] != -1) and
                         world->map().getCell(i, j).isInVision() and
