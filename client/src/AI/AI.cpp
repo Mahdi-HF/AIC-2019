@@ -6,30 +6,34 @@ using namespace std;
 int RowNum = 31;
 int ColumnNum = 31;
 
+bool WAR_IN_OBJECTIVE_ZONE = true;
+
 int mapAnalyse[35][35];
 int SENTRY_ID;
 int BLASTER_ID;
+int BLASTER_ID_2;
 int HEALER_ID;
-int GUARDIAN_ID;
 
 int OPP_SENTRY_ID;
 int OPP_BLASTER_ID;
 int OPP_HEALER_ID;
 int OPP_GUARDIAN_ID;
 
-int Distance_Attack_1; // For Use Ability
-int Distance_Attack_2; // For Use Ability
-int Distance_Attack_3; // For Use Ability
-int Distance_Attack_4; // For Use Ability
+int Distance_Attack_1; // For Using Ability
+int Distance_Attack_2;
+int Distance_Attack_3;
+int Distance_Attack_4;
 
 int HERO_mapAnalyse[35][35];
 
-int targetCellRow[4];
-int targetCellColumn[4];
+//int targetCellRow[4];
+//int targetCellColumn[4];
 
 int minDistance ;
 int minI ;
 int minJ ;
+
+vector<Direction> Mypath;
 
 //----------------------------------------- Functions ------------------------------------------------------------------
 void printMap(World *world)
@@ -122,7 +126,7 @@ void HeroAnalyse(World *world)
         }
         else if (HeroName::GUARDIAN == world->getMyHeroes()[n]->getName())
         {
-            GUARDIAN_ID = world->getMyHeroes()[n]->getId();
+            BLASTER_ID_2 = world->getMyHeroes()[n]->getId();
         }
     }
 }
@@ -204,6 +208,19 @@ void findClosestCell(World *world , int ID)
     }
 }
 
+void moveToCell(World *world , int ID , int count)
+{
+    // find the hero and locate the current cell and wanted cell
+    findClosestCell(world , ID );  //changes minDistance and minI and minJ
+    Mypath = world->getPathMoveDirections( heroLocator(world,ID).getRow(), heroLocator(world,ID).getColumn(),
+                                           cellLocator(world,minI,minJ).getRow(), cellLocator(world,minI,minJ).getColumn() );
+    for (int j = 0; j < count ; ++j)
+    {
+        world->moveHero( ID ,Mypath[j] );
+    }
+}
+
+
 //----------------------------------------- PreProcess -----------------------------------------------------------------
 void AI::preProcess(World *world)
 {
@@ -240,26 +257,14 @@ void AI::pick(World *world)
     cnt++;
 }
 
-bool WAR_IN_OBJECTIVE_ZONE = true;
-
 //----------------------------------------- Move -----------------------------------------------------------------------
 void AI::move(World *world)
 {
     cerr << "-move" << endl;
 
-    // find the hero and locate the current cell and wanted cell
-    findClosestCell(world , SENTRY_ID );  // changes minDistance and minI and minJ
-    vector<Direction> path = world->getPathMoveDirections( heroLocator(world,SENTRY_ID).getRow(),
-                                                           heroLocator(world,SENTRY_ID).getColumn(),
-                                                           cellLocator(world,minI,minJ).getRow(),
-                                                           cellLocator(world,minI,minJ).getColumn() );
-
-    for (int j = 0; j < 6; ++j)
-    {
-        world->moveHero( SENTRY_ID ,path[j] );
-    }
-
-
+    moveToCell(world ,SENTRY_ID , 3 );
+    moveToCell(world ,BLASTER_ID_2 , 3 );
+    moveToCell(world ,BLASTER_ID , 6 );
 
     /*
     static int targetRefreshPeriod = 0;
@@ -289,14 +294,11 @@ void AI::move(World *world)
 
     vector<Hero *> my_heros = world->getMyHeroes();
     for (int i = 0; i < 4; ++i) {
-        vector<Direction> _dirs = world->getPathMoveDirections(my_heros[i]->getCurrentCell().getRow(),
-                                                               my_heros[i]->getCurrentCell().getColumn(),
-                                                               targetCellRow[i],
-                                                               targetCellColumn[i]);
+        vector<Direction> _dirs = world->getPathMoveDirections(my_heros[i]->getCurrentCell().getRow(), my_heros[i]->getCurrentCell().getColumn(),
+                                                               targetCellRow[i], targetCellColumn[i]);
         if (_dirs.size() == 0)//ALWAYS check if there is a path to that target!!!!
             continue;
-        world->moveHero(my_heros[i]->getId(),
-                        _dirs[0]);
+        world->moveHero(my_heros[i]->getId(),_dirs[0]);
     }
 */
 }
