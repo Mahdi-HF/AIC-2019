@@ -3,6 +3,8 @@
 
 using namespace std;
 
+// We have 2 blaster and 1 healer and 1 sentry
+
 int RowNum = 31;
 int ColumnNum = 31;
 
@@ -220,12 +222,10 @@ void moveToCell(World *world , int ID , int count)
     }
 }
 
-
 //----------------------------------------- PreProcess -----------------------------------------------------------------
 void AI::preProcess(World *world)
 {
-    srand(time(0));
-
+//    srand(time(0));
     mapAnalyse0(world);
     HeroAnalyse(world);
     mapAnalysingByHeroesView(world);
@@ -233,7 +233,7 @@ void AI::preProcess(World *world)
 
 //----------------------------------------- Pick -----------------------------------------------------------------------
 void AI::pick(World *world)
-{ // 2 blaster and 1 healer and 1 sentry
+{
     cerr << "-pick" << endl;
     static int cnt = 0;
 
@@ -262,9 +262,11 @@ void AI::move(World *world)
 {
     cerr << "-move" << endl;
 
-    moveToCell(world ,SENTRY_ID , 3 );
+    moveToCell(world ,BLASTER_ID , 3 );
     moveToCell(world ,BLASTER_ID_2 , 3 );
-    moveToCell(world ,BLASTER_ID , 6 );
+
+    //TODO implement the vision array for sentry
+    moveToCell(world ,SENTRY_ID , 6 );
 
     /*
     static int targetRefreshPeriod = 0;
@@ -340,7 +342,7 @@ void AI::action(World *world)
             }
         }
 
-        else if (world->getMyHeroes()[k]->getId() == BLASTER_ID)
+        else if (world->getMyHeroes()[k]->getId() == BLASTER_ID ) // TODO implement the BLASTER_ID_2
         {
             for (int i = 0; i < 32; i++)
             {
@@ -369,6 +371,16 @@ void AI::action(World *world)
                         world->castAbility(world->getHero(BLASTER_ID), world->getHero(BLASTER_ID).getAbility(AbilityName::BLASTER_ATTACK), mapAnalyse[i][j]);
                         break;
                     }
+                }
+            }
+        }
+        else if (world->getMyHeroes()[k]->getId() == HEALER_ID)  // TODO implement the HEALER_ID
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                for (int j = 0; j < 32; j++)
+                {
+                    // nothing yet !
                 }
             }
         }
@@ -472,7 +484,9 @@ for (Hero *my_hero : world->getMyHeroes())
         }
     }
 }
+
+ printMap(world);
+
  */
 
-printMap(world);
 }
