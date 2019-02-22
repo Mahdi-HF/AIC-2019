@@ -195,7 +195,7 @@ void findClosestCell(World *world , int ID)
     {
         for (int j = 0; j < 31; ++j)
         {
-            if( cellLocator(world,i,j).isInObjectiveZone() )
+            if( cellLocator(world,i,j).isInObjectiveZone() and cellLocator(world,i,j).is )
             {
                 int len = world->manhattanDistance( heroLocator(world,ID), cellLocator(world,i,j) );
                 if(len < minDistance)
@@ -329,8 +329,8 @@ void AI::action(World *world)
                     if (world->getHero(SENTRY_ID).getAbility(SENTRY_RAY).getCooldown() == 0 and
                         (mapAnalyse[i][j] != -1) and
                         world->map().getCell(i, j).isInVision() and
-                        HERO_mapAnalyse[i][j] > 2 and
-                        world->manhattanDistance(heroLocator(world, SENTRY_ID), cellLocator(world, i, j)) > 7)
+                        HERO_mapAnalyse[i][j] > 1 and
+                        world->manhattanDistance( heroLocator(world, SENTRY_ID), cellLocator(world, i, j) ) > 7)
                     {
                         world->castAbility(world->getHero(SENTRY_ID), world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_RAY), mapAnalyse[i][j]);
                         break;
@@ -339,7 +339,7 @@ void AI::action(World *world)
                     if (world->getHero(SENTRY_ID).getAbility(SENTRY_ATTACK).getCooldown() == 0 and
                         (mapAnalyse[i][j] != -1) and
                         world->map().getCell(i, j).isInVision() and
-                        HERO_mapAnalyse[i][j] > 2 and
+                        HERO_mapAnalyse[i][j] > 1 and
                         world->manhattanDistance(heroLocator(world, SENTRY_ID), cellLocator(world, i, j)) <= 7)
                     {
                         world->castAbility(world->getHero(SENTRY_ID), world->getHero(SENTRY_ID).getAbility(AbilityName::SENTRY_ATTACK), mapAnalyse[i][j]);
@@ -359,7 +359,7 @@ void AI::action(World *world)
                     if (world->getHero(BLASTER_ID).getAbility(BLASTER_BOMB).getCooldown() == 0 and
                         (mapAnalyse[i][j] != -1) and
                         world->map().getCell(i, j).isInVision() and
-                        HERO_mapAnalyse[i][j] > 2 and
+                        HERO_mapAnalyse[i][j] > 1 and
                         world->manhattanDistance(heroLocator(world, BLASTER_ID), cellLocator(world, i, j)) == 5)
                     {
                         world->castAbility(world->getHero(BLASTER_ID), world->getHero(BLASTER_ID).getAbility(AbilityName::BLASTER_BOMB), mapAnalyse[i][j]);
@@ -372,7 +372,7 @@ void AI::action(World *world)
                     if (world->getHero(BLASTER_ID).getAbility(BLASTER_ATTACK).getCooldown() == 0 and
                         (mapAnalyse[i][j] != -1) and
                         world->map().getCell(i, j).isInVision() and
-                        HERO_mapAnalyse[i][j] > 2 and
+                        HERO_mapAnalyse[i][j] > 1 and
                         world->manhattanDistance(heroLocator(world, BLASTER_ID), cellLocator(world, i, j)) <= 4)
                     {
                         world->castAbility(world->getHero(BLASTER_ID), world->getHero(BLASTER_ID).getAbility(AbilityName::BLASTER_ATTACK), mapAnalyse[i][j]);
