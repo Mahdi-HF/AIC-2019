@@ -210,17 +210,14 @@ void findClosestCell(World *world , int ID)
     }
 }
 
-void moveToCell(World *world , int ID , int count)
+void moveToCell(World *world , int ID )
 {
     // find the hero and locate the current cell and wanted cell
     findClosestCell(world , ID );  //changes minDistance and minI and minJ
     Mypath.clear();
     Mypath = world->getPathMoveDirections( heroLocator(world,ID).getRow(), heroLocator(world,ID).getColumn(),
                                            cellLocator(world,minI,minJ).getRow(), cellLocator(world,minI,minJ).getColumn() );
-    for (int j = 0; j < count ; ++j)
-    {
-        world->moveHero( ID ,Mypath[j] );
-    }
+    world->moveHero( ID ,Mypath[0] );
 }
 
 void fullAnalyse(World *world)
@@ -270,13 +267,13 @@ void AI::move(World *world)
 
     fullAnalyse(world);
 
-    moveToCell(world ,BLASTER_ID , 6 );
-    moveToCell(world ,BLASTER_ID_2 , 6 );
+    moveToCell(world ,BLASTER_ID );
+    moveToCell(world ,BLASTER_ID_2 );
 
-    //TODO implement the vision array for sentry
-    moveToCell(world ,SENTRY_ID , 6 );
+    moveToCell(world ,SENTRY_ID  );
+    moveToCell(world ,HEALER_ID  );  //TODO implement the vision array for sentry
 
-//    /*
+    /*
     static int targetRefreshPeriod = 0;
     if (targetRefreshPeriod <= 0) {
         srand(time(0) + world->getMyHeroes()[0]->getId());//made this so we can test two clients with this exact AI code
@@ -310,7 +307,7 @@ void AI::move(World *world)
             continue;
         world->moveHero(my_heros[i]->getId(),_dirs[0]);
     }
-//*/
+*/
 }
 
 //----------------------------------------- Action ---------------------------------------------------------------------
