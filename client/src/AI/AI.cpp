@@ -16,6 +16,11 @@ int BLASTER_ID;
 int BLASTER_ID_2;
 int HEALER_ID;
 
+Cell SENTRY_CELL;
+Cell BLASTER_CELL;
+Cell BLASTER_CELL_2;
+Cell HEALER_CELL;
+
 int OPP_SENTRY_ID;
 int OPP_BLASTER_ID;
 int OPP_HEALER_ID;
@@ -191,14 +196,24 @@ void findClosestCell(World *world, int ID)
     minDistance = 1000;
     minI = -1;
     minJ = -1;
+
+    SENTRY_CELL = heroLocator(world,SENTRY_ID);
+    HEALER_CELL = heroLocator(world,HEALER_ID);
+    BLASTER_CELL = heroLocator(world,BLASTER_ID);
+    BLASTER_CELL_2 = heroLocator(world,BLASTER_ID_2);
+
     for (int i = 0; i < 31; ++i) //finding the closest obj zone cell
     {
         for (int j = 0; j < 31; ++j)
         {
-            if (cellLocator(world, i, j).isInObjectiveZone() and cellLocator(world, i, j).is)
+            if( cellLocator(world,i,j).isInObjectiveZone() and
+                    cellLocator(world,i,j) == SENTRY_CELL and
+                    cellLocator(world,i,j) == HEALER_CELL and
+                    cellLocator(world,i,j) == BLASTER_CELL and
+                    cellLocator(world,i,j) == BLASTER_CELL_2 )
             {
-                int len = world->manhattanDistance(heroLocator(world, ID), cellLocator(world, i, j));
-                if (len < minDistance)
+                int len = world->manhattanDistance( heroLocator(world,ID), cellLocator(world,i,j) );
+                if(len < minDistance)
                 {
                     minDistance = len;
                     minI = i;
@@ -210,14 +225,14 @@ void findClosestCell(World *world, int ID)
     }
 }
 
-void moveToCell(World *world, int ID)
+void moveToCell(World *world , int ID )
 {
     // find the hero and locate the current cell and wanted cell
-    findClosestCell(world, ID); //changes minDistance and minI and minJ
+    findClosestCell(world , ID );  //changes minDistance and minI and minJ
     Mypath.clear();
-    Mypath = world->getPathMoveDirections(heroLocator(world, ID).getRow(), heroLocator(world, ID).getColumn(),
-                                          cellLocator(world, minI, minJ).getRow(), cellLocator(world, minI, minJ).getColumn());
-    world->moveHero(ID, Mypath[0]);
+    Mypath = world->getPathMoveDirections( heroLocator(world,ID).getRow(), heroLocator(world,ID).getColumn(),
+                                           cellLocator(world,minI,minJ).getRow(), cellLocator(world,minI,minJ).getColumn() );
+    world->moveHero( ID ,Mypath[0] );
 }
 
 void fullAnalyse(World *world)
@@ -231,6 +246,7 @@ void fullAnalyse(World *world)
 void AI::preProcess(World *world)
 {
     srand(time(0));
+
 }
 
 //----------------------------------------- Pick -----------------------------------------------------------------------
@@ -494,4 +510,5 @@ for (Hero *my_hero : world->getMyHeroes())
  printMap(world);
 
  */
+
 }
