@@ -28,8 +28,8 @@ int Distance_Attack_4;
 
 int HERO_mapAnalyse[35][35];
 
-//int targetCellRow[4];
-//int targetCellColumn[4];
+int targetCellRow[4];
+int targetCellColumn[4];
 
 int minDistance ;
 int minI ;
@@ -214,6 +214,7 @@ void moveToCell(World *world , int ID , int count)
 {
     // find the hero and locate the current cell and wanted cell
     findClosestCell(world , ID );  //changes minDistance and minI and minJ
+    Mypath.clear();
     Mypath = world->getPathMoveDirections( heroLocator(world,ID).getRow(), heroLocator(world,ID).getColumn(),
                                            cellLocator(world,minI,minJ).getRow(), cellLocator(world,minI,minJ).getColumn() );
     for (int j = 0; j < count ; ++j)
@@ -269,13 +270,13 @@ void AI::move(World *world)
 
     fullAnalyse(world);
 
-    moveToCell(world ,BLASTER_ID , 3 );
-    moveToCell(world ,BLASTER_ID_2 , 3 );
+    moveToCell(world ,BLASTER_ID , 6 );
+    moveToCell(world ,BLASTER_ID_2 , 6 );
 
     //TODO implement the vision array for sentry
     moveToCell(world ,SENTRY_ID , 6 );
 
-    /*
+//    /*
     static int targetRefreshPeriod = 0;
     if (targetRefreshPeriod <= 0) {
         srand(time(0) + world->getMyHeroes()[0]->getId());//made this so we can test two clients with this exact AI code
@@ -309,7 +310,7 @@ void AI::move(World *world)
             continue;
         world->moveHero(my_heros[i]->getId(),_dirs[0]);
     }
-*/
+//*/
 }
 
 //----------------------------------------- Action ---------------------------------------------------------------------
