@@ -207,10 +207,10 @@ void findClosestCell(World *world, int ID)
         for (int j = 0; j < 31; ++j)
         {
             if( cellLocator(world,i,j).isInObjectiveZone() and
-                    cellLocator(world,i,j) == SENTRY_CELL and
-                    cellLocator(world,i,j) == HEALER_CELL and
-                    cellLocator(world,i,j) == BLASTER_CELL and
-                    cellLocator(world,i,j) == BLASTER_CELL_2 )
+                    cellLocator(world,i,j) != SENTRY_CELL and
+                    cellLocator(world,i,j) != HEALER_CELL and
+                    cellLocator(world,i,j) != BLASTER_CELL and
+                    cellLocator(world,i,j) != BLASTER_CELL_2 )
             {
                 int len = world->manhattanDistance( heroLocator(world,ID), cellLocator(world,i,j) );
                 if(len < minDistance)
