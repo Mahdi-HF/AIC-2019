@@ -133,7 +133,7 @@ void HeroAnalyse(World *world)
     }
 }
 
-void mapAnalyse0(World *world)
+void mapAnalyser(World *world)
 {
     unsigned long ObjectiveZoneSize = world->map().getObjectiveZone().size(); //objective zone
     for (int l = 0; l < ObjectiveZoneSize; l++)
@@ -225,10 +225,8 @@ void moveToCell(World *world , int ID , int count)
 //----------------------------------------- PreProcess -----------------------------------------------------------------
 void AI::preProcess(World *world)
 {
-//    srand(time(0));
-    mapAnalyse0(world);
-    HeroAnalyse(world);
-    mapAnalysingByHeroesView(world);
+    srand(time(0));
+
 }
 
 //----------------------------------------- Pick -----------------------------------------------------------------------
@@ -261,6 +259,10 @@ void AI::pick(World *world)
 void AI::move(World *world)
 {
     cerr << "-move" << endl;
+
+    mapAnalyser(world);
+    HeroAnalyse(world);
+    mapAnalysingByHeroesView(world);
 
     moveToCell(world ,BLASTER_ID , 3 );
     moveToCell(world ,BLASTER_ID_2 , 3 );
