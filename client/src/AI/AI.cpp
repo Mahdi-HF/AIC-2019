@@ -222,6 +222,13 @@ void moveToCell(World *world , int ID , int count)
     }
 }
 
+void fullAnalyse(World *world)
+{
+    mapAnalyser(world);
+    HeroAnalyse(world);
+    mapAnalysingByHeroesView(world);
+}
+
 //----------------------------------------- PreProcess -----------------------------------------------------------------
 void AI::preProcess(World *world)
 {
@@ -260,9 +267,7 @@ void AI::move(World *world)
 {
     cerr << "-move" << endl;
 
-    mapAnalyser(world);
-    HeroAnalyse(world);
-    mapAnalysingByHeroesView(world);
+    fullAnalyse(world);
 
     moveToCell(world ,BLASTER_ID , 3 );
     moveToCell(world ,BLASTER_ID_2 , 3 );
@@ -311,6 +316,8 @@ void AI::move(World *world)
 void AI::action(World *world)
 {
     cerr << "-action" << endl;
+
+    fullAnalyse(world);
 
     for (int k = 0; k < 4; k++)
     {
