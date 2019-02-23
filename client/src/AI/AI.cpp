@@ -391,8 +391,6 @@ void AI::action(World *world)
     BlasterAbilityDone(world , BLASTER_ID_3 , BLASTER_BOMB , BLASTER_ATTACK );
 
 
-    }
-
     /*
 for (Hero *my_hero : world->getMyHeroes())
 {
