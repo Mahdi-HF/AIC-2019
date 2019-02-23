@@ -1,4 +1,4 @@
-# AI Challenge 2019 C++ Client
+# AI Challenge 2019
 
 ## Developers :
 

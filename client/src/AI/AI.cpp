@@ -4,7 +4,6 @@
 using namespace std;
 
 // We have 2 blaster and 1 healer and 1 sentry
-
 int RowNum = 31;
 int ColumnNum = 31;
 
@@ -131,7 +130,7 @@ void HeroAnalyse(World *world)
         {
             HEALER_ID = world->getMyHeroes()[n]->getId();
         }
-        else if (HeroName::GUARDIAN == world->getMyHeroes()[n]->getName())
+        else if (HeroName::BLASTER == world->getMyHeroes()[n]->getName())
         {
             BLASTER_ID_2 = world->getMyHeroes()[n]->getId();
         }
@@ -206,10 +205,8 @@ void findClosestCell(World *world, int ID)
     {
         for (int j = 0; j < 31; ++j)
         {
-            if( cellLocator(world,i,j).isInObjectiveZone() and
-                    cellLocator(world,i,j) != SENTRY_CELL and
-                    cellLocator(world,i,j) != HEALER_CELL and
-                    cellLocator(world,i,j) != BLASTER_CELL and
+            if( cellLocator(world,i,j).isInObjectiveZone() and cellLocator(world,i,j) != SENTRY_CELL and
+                    cellLocator(world,i,j) != HEALER_CELL and cellLocator(world,i,j) != BLASTER_CELL and
                     cellLocator(world,i,j) != BLASTER_CELL_2 )
             {
                 int len = world->manhattanDistance( heroLocator(world,ID), cellLocator(world,i,j) );
@@ -227,7 +224,7 @@ void findClosestCell(World *world, int ID)
 
 void moveToCell(World *world , int ID )
 {
-    // find the hero and locate the current cell and wanted cell
+    // find the hero and locate the current cell and target cell
     findClosestCell(world , ID );  //changes minDistance and minI and minJ
     Mypath.clear();
     Mypath = world->getPathMoveDirections( heroLocator(world,ID).getRow(), heroLocator(world,ID).getColumn(),
