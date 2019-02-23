@@ -245,7 +245,7 @@ void findClosestCell(World *world, int ID)
     }
 }
 
-void moveToCell(World *world , int ID )
+void moveToCell(World *world , int ID )  // TODO sometimes their direction is closed by another hero and their do nothing !
 {
     findClosestCell(world , ID );  //changes minDistance and minI and minJ
     Mypath.clear();
@@ -411,7 +411,7 @@ void AI::action(World *world)
 
     fullAnalyse(world);
 
-    SentryAbilityDone(world , SENTRY_ID , SENTRY_RAY , SENTRY_ATTACK );
+    SentryAbilityDone(world , SENTRY_ID , SENTRY_RAY , SENTRY_ATTACK ); //TODO if every body is in OZ we should save AP for action zone !
 
     BlasterAbilityDone(world , BLASTER_ID , BLASTER_BOMB , BLASTER_ATTACK );
     BlasterAbilityDone(world , BLASTER_ID_2 , BLASTER_BOMB , BLASTER_ATTACK );
