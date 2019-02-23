@@ -13,22 +13,17 @@ int mapAnalyse[35][35];
 int SENTRY_ID;
 int BLASTER_ID;
 int BLASTER_ID_2;
-int HEALER_ID;
+int BLASTER_ID_3;
 
 Cell SENTRY_CELL;
 Cell BLASTER_CELL;
 Cell BLASTER_CELL_2;
-Cell HEALER_CELL;
+Cell BLASTER_CELL_3;
 
-int OPP_SENTRY_ID;
-int OPP_BLASTER_ID;
-int OPP_HEALER_ID;
-int OPP_GUARDIAN_ID;
-
+int currentHeal_Sentry=120;
 int currentHeal_Blaster_1=250;
 int currentHeal_Blaster_2=250;
-int currentHeal_Sentry=120;
-int currentHeal_Healer=200;
+int currentHeal_Blaster_3=250;
 int minHeal=600;
 
 int HERO_mapAnalyse[35][35];
@@ -78,22 +73,18 @@ void mapAnalysingByHeroesView(World *world)
         if (HeroName::BLASTER == world->getOppHeroes()[n]->getName())
         {
             HERO_mapAnalyse[i][j] = 2;
-            OPP_BLASTER_ID = world->getOppHeroes()[n]->getId();
         }
         else if (HeroName::SENTRY == world->getOppHeroes()[n]->getName())
         {
             HERO_mapAnalyse[i][j] = 3;
-            OPP_SENTRY_ID = world->getOppHeroes()[n]->getId();
         }
         else if (HeroName::GUARDIAN == world->getOppHeroes()[n]->getName())
         {
             HERO_mapAnalyse[i][j] = 4;
-            OPP_GUARDIAN_ID = world->getOppHeroes()[n]->getId();
         }
         else if (HeroName::HEALER == world->getOppHeroes()[n]->getName())
         {
             HERO_mapAnalyse[i][j] = 5;
-            OPP_HEALER_ID = world->getOppHeroes()[n]->getId();
         }
     }
 
@@ -125,15 +116,18 @@ void HeroAnalyse(World *world)
         }
         else if (HeroName::BLASTER == world->getMyHeroes()[n]->getName())
         {
-            BLASTER_ID = world->getMyHeroes()[n]->getId();
-        }
-        else if (HeroName::HEALER == world->getMyHeroes()[n]->getName())
-        {
-            HEALER_ID = world->getMyHeroes()[n]->getId();
-        }
-        else if (HeroName::BLASTER == world->getMyHeroes()[n]->getName())
-        {
-            BLASTER_ID_2 = world->getMyHeroes()[n]->getId();
+            if(BLASTER_ID == 0)
+            {
+                BLASTER_ID = world->getMyHeroes()[n]->getId();
+            }
+            else if(BLASTER_ID_2 == 0)
+            {
+                BLASTER_ID_2 = world->getMyHeroes()[n]->getId();
+            }
+            else if(BLASTER_ID_3 == 0)
+            {
+                BLASTER_ID_3 = world->getMyHeroes()[n]->getId();
+            }
         }
     }
 }
@@ -198,20 +192,20 @@ void findClosestCell(World *world, int ID)
     minJ = -1;
 
     SENTRY_CELL = heroLocator(world,SENTRY_ID);
-    HEALER_CELL = heroLocator(world,HEALER_ID);
     BLASTER_CELL = heroLocator(world,BLASTER_ID);
     BLASTER_CELL_2 = heroLocator(world,BLASTER_ID_2);
+    BLASTER_CELL_3 = heroLocator(world,BLASTER_ID_3);
 
     for (int i = 0; i < 31; ++i) //finding the closest obj zone cell
     {
         for (int j = 0; j < 31; ++j)
         {
             if( cellLocator(world,i,j).isInObjectiveZone() and cellLocator(world,i,j) != SENTRY_CELL and
-                    cellLocator(world,i,j) != HEALER_CELL and cellLocator(world,i,j) != BLASTER_CELL and
-                    cellLocator(world,i,j) != BLASTER_CELL_2 )
+                    cellLocator(world,i,j) != BLASTER_CELL and cellLocator(world,i,j) != BLASTER_CELL_2 and
+                    cellLocator(world,i,j) != BLASTER_CELL_3 )
             {
                 int len = world->manhattanDistance( heroLocator(world,ID), cellLocator(world,i,j) );
-                if(len < minDistance)
+                if(len <= minDistance)
                 {
                     minDistance = len;
                     minI = i;
@@ -223,11 +217,10 @@ void findClosestCell(World *world, int ID)
     }
 }
 
-void moveToCell(World *world , int ID )
+void moveToCell(World *world , int ID ) // find the hero and locate the current cell and target cell
 {
-    // find the hero and locate the current cell and target cell
     findClosestCell(world , ID );  //changes minDistance and minI and minJ
-    //Mypath.clear();
+    Mypath.clear();
     Mypath = world->getPathMoveDirections( heroLocator(world,ID).getRow(), heroLocator(world,ID).getColumn(),
                                            cellLocator(world,minI,minJ).getRow(), cellLocator(world,minI,minJ).getColumn() );
     world->moveHero( ID ,Mypath[0] );
@@ -240,11 +233,70 @@ void fullAnalyse(World *world)
     mapAnalysingByHeroesView(world);
 }
 
+void SentryAbilityDone(World *world , int ID , AbilityName firstAbilityName , AbilityName secondAbilityName  ) {
+    for (int k = 0; k < 4; ++k) {
+        if (world->getMyHeroes()[k]->getId() == ID) {
+            for (int i = 0; i < 31; i++) {
+                for (int j = 0; j < 31; j++) {
+//                    cerr<<"i : "<<i<<" j :"<<j<<endl;
+                    if (world->getHero(ID).getAbility(firstAbilityName).getCooldown() == 0 and
+                        (mapAnalyse[i][j] != -1) and world->map().getCell(i, j).isInVision() and
+                        HERO_mapAnalyse[i][j] > 1 and
+                        world->manhattanDistance(heroLocator(world, ID), cellLocator(world, i, j)) > 7) {
+                        world->castAbility(world->getHero(ID), world->getHero(ID).getAbility(firstAbilityName),
+                                           cellLocator(world, i, j));
+//                        cerr<<"Centry Ray Done";
+                        break;
+                    }
+
+                    if (world->getHero(ID).getAbility(secondAbilityName).getCooldown() == 0 and
+                        (mapAnalyse[i][j] != -1) and world->map().getCell(i, j).isInVision() and
+                        HERO_mapAnalyse[i][j] > 1 and
+                        world->manhattanDistance(heroLocator(world, ID), cellLocator(world, i, j)) <= 7) {
+                        world->castAbility(world->getHero(ID), world->getHero(ID).getAbility(secondAbilityName),
+                                           cellLocator(world, i, j));
+//                        cerr<<"Centry Attack Done";
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+    void BlasterAbilityDone(World *world , int ID , AbilityName firstAbilityName , AbilityName secondAbilityName )
+    {
+        for (int k = 0; k < 4 ; ++k)
+        {
+            if (world->getMyHeroes()[k]->getId() == ID)
+            {
+                for (int i = 0; i < 31 ; i++) {
+                    for (int j = 0; j < 31 ; j++) {
+                        if (world->getHero(ID).getAbility(firstAbilityName).getCooldown() == 0 and (mapAnalyse[i][j] != -1) and
+                            world->map().getCell(i, j).isInVision() and HERO_mapAnalyse[i][j] > 1 and
+                            world->manhattanDistance(heroLocator(world, ID), cellLocator(world, i, j)) == 5)
+                        {
+                            world->castAbility(world->getHero(ID),world->getHero(ID).getAbility(firstAbilityName),cellLocator(world, i, j));
+                            break;
+                        }
+
+                        if (world->getHero(ID).getAbility(secondAbilityName).getCooldown() == 0 and(mapAnalyse[i][j] != -1) and
+                            world->map().getCell(i, j).isInVision() and HERO_mapAnalyse[i][j] > 1 and
+                            world->manhattanDistance(heroLocator(world, ID), cellLocator(world, i, j)) <= 4)
+                        {
+                            world->castAbility(world->getHero(ID), world->getHero(ID).getAbility(secondAbilityName), cellLocator(world, i, j));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 //----------------------------------------- PreProcess -----------------------------------------------------------------
 void AI::preProcess(World *world)
 {
     srand(time(0));
-
 }
 
 //----------------------------------------- Pick -----------------------------------------------------------------------
@@ -259,7 +311,7 @@ void AI::pick(World *world)
         world->pickHero(HeroName::BLASTER);
         break;
     case 1:
-        world->pickHero(HeroName::HEALER);
+        world->pickHero(HeroName::BLASTER);
         break;
     case 2:
         world->pickHero(HeroName::BLASTER);
@@ -279,12 +331,14 @@ void AI::move(World *world)
     cerr << "-move" << endl;
 
     fullAnalyse(world);
-    if(world->getAP()>80) {
+
+    if(world->getAP() > 80)
+    {
         moveToCell(world, BLASTER_ID);
         moveToCell(world, BLASTER_ID_2);
+        moveToCell(world, BLASTER_ID_3);
 
-        moveToCell(world, SENTRY_ID);
-        moveToCell(world, HEALER_ID); //TODO implement the vision array for sentry
+        moveToCell(world, SENTRY_ID); //TODO implement the vision array for sentry
     }
     /*
     static int targetRefreshPeriod = 0;
@@ -328,150 +382,14 @@ void AI::action(World *world)
 {
     cerr << "-action" << endl;
 
-    printMap(world);
     fullAnalyse(world);
 
-    for (int k = 0; k < 4; k++)
-    {
-        if (world->getMyHeroes()[k]->getId() == SENTRY_ID)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                for (int j = 0; j < 32; j++)
-                {
-                    cerr<<"i : "<<i<<" j :"<<j<<endl;
-                    //...................................  Sentry_Ray.................................
-                    if (world->getHero(SENTRY_ID).getAbility(SENTRY_RAY).getCooldown() == 0 and
-                        (mapAnalyse[i][j] != -1) and
-                        world->map().getCell(i, j).isInVision() and
-                        HERO_mapAnalyse[i][j] > 1 and
-                        world->manhattanDistance(heroLocator(world, SENTRY_ID), cellLocator(world, i, j)) > 7)
-                    {
-                        world->castAbility(world->getHero(SENTRY_ID), world->getHero(SENTRY_ID).getAbility(SENTRY_RAY), cellLocator(world, i, j));
-                        cerr<<"Centry Ray Don";
-                        break;
-                    }
-                    //................................... Action Sentry_ATTACK.................................
-                    if (world->getHero(SENTRY_ID).getAbility(SENTRY_ATTACK).getCooldown() == 0 and
-                        (mapAnalyse[i][j] != -1) and
-                        world->map().getCell(i, j).isInVision() and
-                        HERO_mapAnalyse[i][j] > 1 and
-                        world->manhattanDistance(heroLocator(world, SENTRY_ID), cellLocator(world, i, j)) <= 7)
-                    {
-                        world->castAbility(world->getHero(SENTRY_ID), world->getHero(SENTRY_ID).getAbility(SENTRY_ATTACK), cellLocator(world, i, j));
-                        cerr<<"Centry Attack Don";
-                        break;
-                    }
-                }
-            }
-        }
+    SentryAbilityDone(world , SENTRY_ID , SENTRY_RAY , SENTRY_ATTACK );
 
-        else if (world->getMyHeroes()[k]->getId() == BLASTER_ID) // TODO implement the BLASTER_ID_2
-        {
-            for (int i = 0; i < 32; i++) {
-                for (int j = 0; j < 32; j++) {
-                    //.................................... Blaster_Bomb ..........................
-                    if (world->getHero(BLASTER_ID).getAbility(BLASTER_BOMB).getCooldown() == 0 and
-                        (mapAnalyse[i][j] != -1) and
-                        world->map().getCell(i, j).isInVision() and
-                        HERO_mapAnalyse[i][j] > 1 and
-                        world->manhattanDistance(heroLocator(world, BLASTER_ID), cellLocator(world, i, j)) == 5) {
-                        world->castAbility(world->getHero(BLASTER_ID),
-                                           world->getHero(BLASTER_ID).getAbility(BLASTER_BOMB),
-                                           cellLocator(world, i, j));
-                        break;
-                    }
-                    // Sharte dg baraye inke agar 2 ya chandta hero doshman too ye nahie be fasele 2 boodan biyad bezane
-                    //Olaviat ba bala e
+    BlasterAbilityDone(world , BLASTER_ID , BLASTER_BOMB , BLASTER_ATTACK );
+    BlasterAbilityDone(world , BLASTER_ID_2 , BLASTER_BOMB , BLASTER_ATTACK );
+    BlasterAbilityDone(world , BLASTER_ID_3 , BLASTER_BOMB , BLASTER_ATTACK );
 
-                    //..............................BLASTER_ATTACK...................................
-                    if (world->getHero(BLASTER_ID).getAbility(BLASTER_ATTACK).getCooldown() == 0 and
-                        (mapAnalyse[i][j] != -1) and
-                        world->map().getCell(i, j).isInVision() and
-                        HERO_mapAnalyse[i][j] > 1 and
-                        world->manhattanDistance(heroLocator(world, BLASTER_ID), cellLocator(world, i, j)) <= 4) {
-                        world->castAbility(world->getHero(BLASTER_ID),
-                                           world->getHero(BLASTER_ID).getAbility(BLASTER_ATTACK),
-                                           cellLocator(world, i, j));
-                        break;
-                    }
-                }
-            }
-        }
-        else if (world->getMyHeroes()[k]->getId() == BLASTER_ID_2) // TODO implement the BLASTER_ID_2
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                for (int j = 0; j < 32; j++)
-                {
-                    //.................................... Blaster_2_Bomb ..........................
-                    if (world->getHero(BLASTER_ID_2).getAbility(BLASTER_BOMB).getCooldown() == 0 and
-                        (mapAnalyse[i][j] != -1) and
-                        world->map().getCell(i, j).isInVision() and
-                        HERO_mapAnalyse[i][j] > 1 and
-                        world->manhattanDistance(heroLocator(world, BLASTER_ID_2), cellLocator(world, i, j)) == 5)
-                    {
-                        world->castAbility(world->getHero(BLASTER_ID_2), world->getHero(BLASTER_ID_2).getAbility(BLASTER_BOMB), cellLocator(world, i, j));
-                        break;
-                    }
-                    // Sharte dg baraye inke agar 2 ya chandta hero doshman too ye nahie be fasele 3 boodan biyad bezane
-                    //Olaviat ba bala e
-
-                    //..............................BLASTER_2_ATTACK...................................
-                    if (world->getHero(BLASTER_ID_2).getAbility(BLASTER_ATTACK).getCooldown() == 0 and
-                        (mapAnalyse[i][j] != -1) and
-                        world->map().getCell(i, j).isInVision() and
-                        HERO_mapAnalyse[i][j] > 1 and
-                        world->manhattanDistance(heroLocator(world, BLASTER_ID_2), cellLocator(world, i, j)) <= 4)
-                    {
-                        world->castAbility(world->getHero(BLASTER_ID_2), world->getHero(BLASTER_ID_2).getAbility(BLASTER_ATTACK), cellLocator(world, i, j));
-                        break;
-                    }
-                }
-            }
-        }
-        //....................................................Healer Heal .............................................
-        if (world->getMyHeroes()[k]->getId()==HEALER_ID && world->getHero(HEALER_ID).getAbility(HEALER_HEAL).getCooldown() == 0)
-        {
-                currentHeal_Blaster_1 -= world->getHero(BLASTER_ID).getCurrentHP(); // HP Kam Shode Blaster1
-                currentHeal_Blaster_2 -= world->getHero(BLASTER_ID_2).getCurrentHP(); //HP Kam Shode Blaster2
-                currentHeal_Sentry = world->getHero(SENTRY_ID).getCurrentHP(); //HP Kam Shode Sentry
-                currentHeal_Healer = world->getHero(HEALER_ID).getCurrentHP(); //HP Kam Shode Healer
-                int currentHealArray[4] = {currentHeal_Blaster_1, currentHeal_Blaster_2, currentHeal_Sentry,
-                                           currentHeal_Healer};
-
-                // Find Hero With Min Heal
-                for (int i = 0; i < 4; ++i)
-                {
-                    if (currentHealArray[i] < minHeal)
-                    {
-                        minHeal = currentHealArray[i];
-                    }
-                }
-                // Cast Ability Healer
-                if (currentHeal_Blaster_1 ==minHeal )
-                {
-                    world->castAbility(world->getHero(HEALER_ID),world->getHero(HEALER_ID).getAbility(HEALER_HEAL),heroLocator(world,BLASTER_ID).getRow(),heroLocator(world,BLASTER_ID).getColumn());
-                    break;
-                }
-                if (currentHeal_Blaster_2 ==minHeal )
-                {
-                    world->castAbility(world->getHero(HEALER_ID),world->getHero(HEALER_ID).getAbility(HEALER_HEAL),heroLocator(world,BLASTER_ID_2).getRow(),heroLocator(world,BLASTER_ID_2).getColumn());
-                    break;
-                }
-                if (currentHeal_Blaster_1 ==minHeal )
-                {
-                    world->castAbility(world->getHero(HEALER_ID),world->getHero(HEALER_ID).getAbility(HEALER_HEAL),heroLocator(world,SENTRY_ID).getRow(),heroLocator(world,SENTRY_ID).getColumn());
-                    break;
-                }
-                if (currentHeal_Blaster_1 ==minHeal )
-                {
-                    world->castAbility(world->getHero(HEALER_ID),world->getHero(HEALER_ID).getAbility(HEALER_HEAL),heroLocator(world,HEALER_ID).getRow(),heroLocator(world,HEALER_ID).getColumn());
-                    break;
-                }
-        }
-        //....................................................................................................................
-        //..................................................Healer Attack.....................................................
 
     }
 
@@ -574,8 +492,8 @@ for (Hero *my_hero : world->getMyHeroes())
     }
 }
 
- printMap(world);
+*/
 
- */
+ printMap(world);
 
 }
