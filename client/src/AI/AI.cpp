@@ -430,7 +430,9 @@ void AI::move(World *world) {
                 Cell targetCell = findClosestCell(world, my_heros[i]->getId());
                 targetCellRow[i]    = targetCell.getRow();
                 targetCellColumn[i] = targetCell.getColumn();
-                //cerr << "the hero is not in OBJZONE and the target for hero with place i:"<<my_heros[i]->getCurrentCell().getRow() <<" j: "<<my_heros[i]->getCurrentCell().getColumn()<< "is i: "<<targetCellRow[i] << "j:"<<targetCellColumn[i]<< endl;
+                //cerr << "the hero is not in OBJZONE and the target for hero with place i:"<
+                // <my_heros[i]->getCurrentCell().getRow() <<" j: "<<my_heros[i]->getCurrentCell().getColumn()<< "is i:
+                // "<<targetCellRow[i] << "j:"<<targetCellColumn[i]<< endl;
             }
             else
             {
@@ -458,7 +460,8 @@ void AI::move(World *world) {
                                                                    my_heros[i]->getCurrentCell().getColumn(),
                                                                    targetCellRow[i],targetCellColumn[i]);
             //cerr<<"the target to move is"<<targetCellRow[i]<<"and :"<<targetCellColumn[i]<<endl;
-            if ((_dirs.size() != 0 and !my_heros[i]->getCurrentCell().isInObjectiveZone()) or (_dirs.size()!=0 and world->getAP()>80))//ALWAYS check if there is a path to that target!!!!
+            if ((_dirs.size() != 0 and !my_heros[i]->getCurrentCell().isInObjectiveZone()) or (_dirs.size()!=0 and world->getAP()>80))
+                //ALWAYS check if there is a path to that target!!!!
                 world->moveHero(my_heros[i]->getId(),_dirs[0]);
                // cerr<<"trying to move and nomove is: "<<nomove<<endl;
 
@@ -471,7 +474,7 @@ void AI::action(World *world)
 {
     HeroAnalyse(world);
     cerr<<"B ID1 = "<<BLASTER_ID<<"B ID2 = "<<BLASTER_ID_2<<"B ID1 = "<<BLASTER_ID_3<<"SEnt ID: "<<SENTRY_ID<<endl;
-    printMap(world);
+//    printMap(world);
     cerr << "-action" << endl;
 for (Hero *my_hero : world->getMyHeroes())
 {
@@ -480,19 +483,19 @@ for (Hero *my_hero : world->getMyHeroes())
         //Find the closest bombing target
         Cell bombing_cell = Cell::NULL_CELL;
         int min_dist = 10000;
-        for(Hero* opp_hero : world->getOppHeroes()){
+        for(Hero* opp_hero : world->getOppHeroes())
+        {
             if(opp_hero->getCurrentCell().isInVision())//if hero is seen
             {
-                if(min_dist > world->manhattanDistance(opp_hero->getCurrentCell(),
-                                                       my_hero->getCurrentCell())){
-                    min_dist = world->manhattanDistance(opp_hero->getCurrentCell(),
-                                                        my_hero->getCurrentCell());
+                if(min_dist > world->manhattanDistance(opp_hero->getCurrentCell(), my_hero->getCurrentCell() ) )
+                {
+                    min_dist = world->manhattanDistance(opp_hero->getCurrentCell(), my_hero->getCurrentCell());
                     bombing_cell = opp_hero->getCurrentCell();
                 }
             }
         }
         //Perform the bombing
-        if(bombing_cell != Cell::NULL_CELL and my_hero->getAbility(BLASTER_BOMB).getCooldown()!=0) {
+        if(bombing_cell != Cell::NULL_CELL ) {
             cerr<<"The BlasterBOmb is doing... \n ";
             world->castAbility(*my_hero, AbilityName::BLASTER_ATTACK,bombing_cell);
         }else
@@ -514,11 +517,9 @@ for (Hero *my_hero : world->getMyHeroes())
         {
             if (opp_hero->getCurrentCell().isInVision()) //if hero is seen
             {
-                if (min_dist > world->manhattanDistance(opp_hero->getCurrentCell(),
-                                                        my_hero->getCurrentCell()))
+                if (min_dist > world->manhattanDistance(opp_hero->getCurrentCell(), my_hero->getCurrentCell()))
                 {
-                    min_dist = world->manhattanDistance(opp_hero->getCurrentCell(),
-                                                        my_hero->getCurrentCell());
+                    min_dist = world->manhattanDistance(opp_hero->getCurrentCell(), my_hero->getCurrentCell());
                     shoot_cell = opp_hero->getCurrentCell();
                 }
             }
@@ -533,15 +534,16 @@ for (Hero *my_hero : world->getMyHeroes())
     {
         //Find the closest healing target
         Cell target_heal_cell = Cell::NULL_CELL;
-        int min_dist = 10000;
-        for (Hero *_hero : world->getMyHeroes())
+//        int min_dist = 10000;
+        int lostHealth = 0;
+        for (Hero *_hero : world->getMyHeroes() )
         {
-            if (min_dist > world->manhattanDistance(_hero->getCurrentCell(), my_hero->getCurrentCell()) and
-                _hero->getRemRespawnTime() == 0 and
-                _hero->getCurrentHP() != _hero->getMaxHP())
+            if ( lostHealth < ( _hero->getMaxHP() - _hero->getCurrentHP() ) and
+                _hero->getRemRespawnTime() == 0 and _hero->getCurrentHP() != _hero->getMaxHP()  )
+                //min_dist > world->manhattanDistance(_hero->getCurrentCell(), my_hero->getCurrentCell())
             {
-                min_dist = world->manhattanDistance(_hero->getCurrentCell(),
-                                                    my_hero->getCurrentCell());
+//                min_dist = world->manhattanDistance(_hero->getCurrentCell(), my_hero->getCurrentCell() );
+                lostHealth = _hero->getMaxHP() - _hero->getCurrentHP() ;
                 target_heal_cell = _hero->getCurrentCell();
             }
         }
@@ -556,11 +558,9 @@ for (Hero *my_hero : world->getMyHeroes())
         {
             if (opp_hero->getCurrentCell().isInVision()) //if hero is seen
             {
-                if (min_dist2 > world->manhattanDistance(opp_hero->getCurrentCell(),
-                                                        my_hero->getCurrentCell()))
+                if (min_dist2 > world->manhattanDistance(opp_hero->getCurrentCell(), my_hero->getCurrentCell()))
                 {
-                    min_dist2 = world->manhattanDistance(opp_hero->getCurrentCell(),
-                                                        my_hero->getCurrentCell());
+                    min_dist2 = world->manhattanDistance(opp_hero->getCurrentCell(), my_hero->getCurrentCell());
                     attack_cell = opp_hero->getCurrentCell();
                 }
             }
