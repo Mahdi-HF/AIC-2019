@@ -539,7 +539,8 @@ for (Hero *my_hero : world->getMyHeroes())
         for (Hero *_hero : world->getMyHeroes() )
         {
             if ( lostHealth < ( _hero->getMaxHP() - _hero->getCurrentHP() ) and
-                _hero->getRemRespawnTime() == 0 and _hero->getCurrentHP() != _hero->getMaxHP()  )
+                _hero->getRemRespawnTime() == 0 and _hero->getCurrentHP() != _hero->getMaxHP() and
+                world->manhattanDistance( _hero->getCurrentCell() , my_hero->getCurrentCell() ) <= 4 )
                 //min_dist > world->manhattanDistance(_hero->getCurrentCell(), my_hero->getCurrentCell())
             {
 //                min_dist = world->manhattanDistance(_hero->getCurrentCell(), my_hero->getCurrentCell() );
