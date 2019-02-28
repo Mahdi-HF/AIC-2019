@@ -481,31 +481,80 @@ for (Hero *my_hero : world->getMyHeroes())
     if (my_hero->getName() == HeroName::BLASTER)
     {
         //Find the closest bombing target
-        Cell bombing_cell = Cell::NULL_CELL;
+        int opp_heal[4]={500,500,500,500};
+        int opp_max_heal;
+        int opp_max_heal_row=-1;
+        int opp_max_heal_columnn=-1;
+        int bombing_cell_row = -1;
+        int bombing_cell_column=-1;
+        int middle_cell_row= -1;
+        int middle_cell_column= -1;
+        int attacking_cell_row=-1;
+        int attacking_cell_column=-1;
         int min_dist = 10000;
-        for(Hero* opp_hero : world->getOppHeroes())
+        for (int k = 0; k < 4; ++k)
         {
-            if(opp_hero->getCurrentCell().isInVision())//if hero is seen
+            for (int i = 0; i < 4; ++i)
             {
-                if(min_dist > world->manhattanDistance(opp_hero->getCurrentCell(), my_hero->getCurrentCell() ) )
+                opp_heal[i]=world->getOppHeroes()[k]->getMaxHP()-world->getOppHeroes()[k]->getCurrentHP();
+                opp_max_heal=opp_heal[0];
+                if (opp_heal[i]>opp_max_heal)
                 {
-                    min_dist = world->manhattanDistance(opp_hero->getCurrentCell(), my_hero->getCurrentCell());
-                    bombing_cell = opp_hero->getCurrentCell();
+                    opp_max_heal=opp_heal[i];
+                }
+            }
+
+
+            if (world->manhattanDistance(my_hero->getCurrentCell(),world->getOppHeroes()[k]->getCurrentCell())<=4)
+            {
+                attacking_cell_column=world->getOppHeroes()[k]->getCurrentCell().getColumn();
+                attacking_cell_row=world->getOppHeroes()[k]->getCurrentCell().getRow();
+            }
+            if (world->manhattanDistance(my_hero->getCurrentCell(),world->getOppHeroes()[k]->getCurrentCell())>4)
+            {
+                for (int j = 0; j < 4; ++j)
+                {
+                    if(opp_heal[j]==opp_max_heal)
+                    {
+                        bombing_cell_row =world->getOppHeroes()[j]->getCurrentCell().getRow();
+                        bombing_cell_column =world->getOppHeroes()[j]->getCurrentCell().getColumn();
+
+                    }
+                    else
+                        {
+
+                        bombing_cell_column=world->getOppHeroes()[k]->getCurrentCell().getColumn();
+                        bombing_cell_row=world->getOppHeroes()[k]->getCurrentCell().getRow();
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < 4; ++i) {
+            for (int j = i+1; j < 4; ++j) {
+                if (((world->getOppHeroes()[i]->getCurrentCell().getColumn()-world->getOppHeroes()[j]->getCurrentCell().getColumn())+(world->getOppHeroes()[i]->getCurrentCell().getRow()-world->getOppHeroes()[j]->getCurrentCell().getRow()))/2<5)
+                {
+                    middle_cell_column=(world->getOppHeroes()[i]->getCurrentCell().getColumn()-world->getOppHeroes()[j]->getCurrentCell().getColumn())/2;
+                    middle_cell_row=(world->getOppHeroes()[i]->getCurrentCell().getRow()-world->getOppHeroes()[j]->getCurrentCell().getRow())/2;
                 }
             }
         }
         //Perform the bombing
-        if(bombing_cell != Cell::NULL_CELL ) {
+
+        if(middle_cell_column!=-1 and middle_cell_row!=-1)
+        {
+            world->castAbility(my_hero->getId(),BLASTER_BOMB,world->map().getCell(middle_cell_row,middle_cell_column));
+            cerr<<"middle cell attack is don";
+        }
+        if(bombing_cell_column!=-1&&bombing_cell_row!=-1) {
             cerr<<"The BlasterBOmb is doing... \n ";
-            world->castAbility(*my_hero, AbilityName::BLASTER_ATTACK,bombing_cell);
-        }else
-        if(bombing_cell != Cell::NULL_CELL) {
-            world->castAbility(*my_hero, AbilityName::BLASTER_ATTACK,bombing_cell);
+            world->castAbility(*my_hero, AbilityName::BLASTER_BOMB,world->map().getCell(attacking_cell_row,attacking_cell_column));
+        }
+        else
+        if(attacking_cell_column!=-1 and attacking_cell_row!=-1) {
+            world->castAbility(*my_hero, AbilityName::BLASTER_ATTACK,world->map().getCell(attacking_cell_row,attacking_cell_column));
             cerr<<"The BlasterAttack is doing... \n ";
 
         }
-
-        //Perform the bombing
 
     }
     else if (my_hero->getName() == HeroName::SENTRY)
