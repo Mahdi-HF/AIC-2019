@@ -236,6 +236,7 @@ bool res=false;
 Cell findClosestCell(World *world, int ID)
 {
     minDistance = 1000;
+    Cell firstStep = Cell::NULL_CELL ;
     int minrow = -1;
     int mincol = -1;
     int len=0;
@@ -246,8 +247,7 @@ Cell findClosestCell(World *world, int ID)
         {
             if( Isempty(world , i , j) and cellLocator(world,i,j).isInObjectiveZone() )
             {
-                Cell firstStep =  world->getPathMoveDirections(world->getHero(ID).getCurrentCell().getRow(), world->getHero(ID).getCurrentCell().getColumn(),
-                                                          targetCellRow[i] , targetCellColumn[i])[0] ;
+                firstStep = world->getPathMoveDirections(world->getHero(ID).getCurrentCell().getRow(), world->getHero(ID).getCurrentCell().getColumn(), i, j)[0];
                 len = world->manhattanDistance( heroLocator(world,ID), cellLocator(world,i,j) );
                 if( Isempty(world,firstStep.getRow(),firstStep.getColumn()) and len <= minDistance )
                 {
@@ -261,7 +261,7 @@ Cell findClosestCell(World *world, int ID)
     return cellLocator(world ,minrow ,mincol);
 }
 
-void moveToCell(World *world , int ID )  // TODO sometimes their direction is closed by another hero and their do nothing !
+void moveToCell(World *world , int ID )
 {
     findClosestCell(world , ID );  //changes minDistance and minI and minJ
     Mypath.clear();
