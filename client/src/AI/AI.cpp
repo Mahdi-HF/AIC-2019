@@ -244,10 +244,12 @@ Cell findClosestCell(World *world, int ID)
     {
         for (int j = 0; j < 31; ++j)
         {
-            if(Isempty(world , i , j) and cellLocator(world,i,j).isInObjectiveZone())
+            if( Isempty(world , i , j) and cellLocator(world,i,j).isInObjectiveZone() )
             {
-                 len = world->manhattanDistance( heroLocator(world,ID), cellLocator(world,i,j) );
-                if(len <= minDistance)
+                Cell firstStep =  world->getPathMoveDirections(world->getHero(ID).getCurrentCell().getRow(), world->getHero(ID).getCurrentCell().getColumn(),
+                                                          targetCellRow[i] , targetCellColumn[i])[0] ;
+                len = world->manhattanDistance( heroLocator(world,ID), cellLocator(world,i,j) );
+                if( Isempty(world,firstStep.getRow(),firstStep.getColumn()) and len <= minDistance )
                 {
                     minDistance = len;
                     minrow = i;
@@ -473,12 +475,14 @@ void AI::move(World *world) {
                 {
                     Cell target_heal_cell_move_near = Cell::NULL_CELL;
                     [&] {
-                        for (int j = 0; j < 3 ; ++j)
+                        for (int j = -1 ; j < 2 ; ++j)
                         {
-                            for (int k = 0; k < 3 ; ++k)
+                            for (int k = -1 ; k < 2 ; ++k)
                             {
-                                target_heal_cell_move_near = world->map().getCell( target_heal_cell_move.getRow()-j , target_heal_cell_move.getColumn()-k );
-                                if( !target_heal_cell_move_near.isWall() )
+                                int x = target_heal_cell_move.getRow() + j ;
+                                int y = target_heal_cell_move.getRow() + k ;
+                                target_heal_cell_move_near = world->map().getCell( x , y );
+                                if( !target_heal_cell_move_near.isWall() and Isempty(world,x,y) )
                                 {
                                     targetCellRow[i] = target_heal_cell_move_near.getRow() ;
                                     targetCellColumn[i] = target_heal_cell_move_near.getColumn() ;
@@ -494,9 +498,8 @@ void AI::move(World *world) {
         for (int i = 0; i < 4 ; ++i)
         {
             //cerr<<"the target to move is"<<targetCellRow[i]<<"and :"<<targetCellColumn[i]<<"and canmove is"<<canmove[i]<<endl;
-            vector<Direction> _dirs = world->getPathMoveDirections(my_heros[i]->getCurrentCell().getRow(),
-                                                                   my_heros[i]->getCurrentCell().getColumn(),
-                                                                   targetCellRow[i],targetCellColumn[i]);
+            vector<Direction> _dirs = world->getPathMoveDirections(my_heros[i]->getCurrentCell().getRow(), my_heros[i]->getCurrentCell().getColumn(),
+                                                                   targetCellRow[i] , targetCellColumn[i]);
             //cerr<<"the target to move is"<<targetCellRow[i]<<"and :"<<targetCellColumn[i]<<endl;
             if ((_dirs.size() != 0 and !my_heros[i]->getCurrentCell().isInObjectiveZone()) or (_dirs.size()!=0 and world->getAP()>80))
                 //ALWAYS check if there is a path to that target!!!!
@@ -510,7 +513,7 @@ void AI::move(World *world) {
 void AI::action(World *world)
 {
     HeroAnalyse(world);
-    cerr<<"B ID1 = "<<BLASTER_ID<<"B ID2 = "<<BLASTER_ID_2<<"B ID1 = "<<BLASTER_ID_3<<"SEnt ID: "<<SENTRY_ID<<endl;
+//    cerr<<"B ID1 = "<<BLASTER_ID<<"B ID2 = "<<BLASTER_ID_2<<"B ID1 = "<<BLASTER_ID_3<<"SEnt ID: "<<SENTRY_ID<<endl;
 //    printMap(world);
     cerr << "-action" << endl;
 for (Hero *my_hero : world->getMyHeroes())
