@@ -2,8 +2,6 @@
 #include "AI.h"
 using namespace std;
 
-// We have 3 blaster and 1 healer ...
-
 int RowNum = 31;
 int ColumnNum = 31;
 
@@ -261,7 +259,7 @@ Cell findClosestCell(World *world, int ID)
     return cellLocator(world ,minrow ,mincol);
 }
 
-void moveToCell(World *world , int ID )  // problem : sometimes their direction is closed by another hero and their do nothing !
+void moveToCell(World *world , int ID )  // TODO sometimes their direction is closed by another hero and their do nothing !
 {
     findClosestCell(world , ID );  //changes minDistance and minI and minJ
     Mypath.clear();
@@ -483,73 +481,49 @@ for (Hero *my_hero : world->getMyHeroes())
     if (my_hero->getName() == HeroName::BLASTER)
     {
         //Find the closest bombing target
-        int opp_heal[4];
-        int opp_max_heal=-1;
-        int opp_max_heal_row=-1;
-        int opp_max_heal_columnn=-1;
         int bombing_cell_row = -1;
         int bombing_cell_column=-1;
         int middle_cell_row= -1;
         int middle_cell_column= -1;
         int attacking_cell_row=-1;
         int attacking_cell_column=-1;
-
+        int min_dist = 10000;
         for (int k = 0; k < 4; ++k)
         {
-            opp_heal[k] = world->getOppHeroes()[k]->getMaxHP() - world->getOppHeroes()[k]->getCurrentHP();
-            if (opp_heal[k] > opp_max_heal) {
-                opp_max_heal = opp_heal[k];
-            }
-        }
-
-        for (int k = 0; k < 4; ++k)
-        {
-            if (world->manhattanDistance(my_hero->getCurrentCell(),world->getOppHeroes()[k]->getCurrentCell() ) <= 4 and
-                world->getOppHeroes()[k]->getCurrentCell().isInVision() )
+            if (world->manhattanDistance(my_hero->getCurrentCell(),world->getOppHeroes()[k]->getCurrentCell())<=4)
             {
                 attacking_cell_column=world->getOppHeroes()[k]->getCurrentCell().getColumn();
                 attacking_cell_row=world->getOppHeroes()[k]->getCurrentCell().getRow();
             }
-
-            if (world->manhattanDistance(my_hero->getCurrentCell(),world->getOppHeroes()[k]->getCurrentCell() ) == 5 )
+            if (world->manhattanDistance(my_hero->getCurrentCell(),world->getOppHeroes()[k]->getCurrentCell())==5)
             {
-                for (int j = 0; j < 4; ++j)
-                {
-                    if (opp_heal[j] == opp_max_heal)
-                    {
-                        bombing_cell_row = world->getOppHeroes()[j]->getCurrentCell().getRow();
-                        bombing_cell_column = world->getOppHeroes()[j]->getCurrentCell().getColumn();
-
-                    }
-                    else
-                        {
-                        bombing_cell_column = world->getOppHeroes()[k]->getCurrentCell().getColumn();
-                        bombing_cell_row = world->getOppHeroes()[k]->getCurrentCell().getRow();
-                    }
-                }
+                bombing_cell_column=world->getOppHeroes()[k]->getCurrentCell().getColumn();
+                bombing_cell_row=world->getOppHeroes()[k]->getCurrentCell().getRow();
+                
             }
         }
-
+        /*
         for (int i = 0; i < 4; ++i) {
             for (int j = i+1; j < 4; ++j) {
-                if (((world->getOppHeroes()[i]->getCurrentCell().getColumn()-world->getOppHeroes()[j]->getCurrentCell().getColumn())+
-                (world->getOppHeroes()[i]->getCurrentCell().getRow()-world->getOppHeroes()[j]->getCurrentCell().getRow()))/2<5)
+                if (((world->getOppHeroes()[i]->getCurrentCell().getColumn()-world->getOppHeroes()[j]->getCurrentCell().getColumn())+(world->getOppHeroes()[i]->getCurrentCell().getRow()-world->getOppHeroes()[j]->getCurrentCell().getRow()))/2<5)
                 {
                     middle_cell_column=(world->getOppHeroes()[i]->getCurrentCell().getColumn()-world->getOppHeroes()[j]->getCurrentCell().getColumn())/2;
                     middle_cell_row=(world->getOppHeroes()[i]->getCurrentCell().getRow()-world->getOppHeroes()[j]->getCurrentCell().getRow())/2;
                 }
             }
         }
-
+        */
         //Perform the bombing
-        if(middle_cell_column!=-1 and middle_cell_row!=-1)
+
+       /* if(middle_cell_column!=-1 and middle_cell_row!=-1)
         {
             world->castAbility(my_hero->getId(),BLASTER_BOMB,world->map().getCell(middle_cell_row,middle_cell_column));
-            cerr<<"middle cell attack is done";
+            cerr<<"middle cell attack is don";
         }
+        */
         if(bombing_cell_column!=-1&&bombing_cell_row!=-1) {
-            cerr<<"The BlasterBomb is doing... \n ";
-            world->castAbility(*my_hero, AbilityName::BLASTER_BOMB,world->map().getCell(attacking_cell_row,attacking_cell_column));
+            cerr<<"The BlasterBOmb is doing... \n ";
+            world->castAbility(*my_hero, AbilityName::BLASTER_BOMB,world->map().getCell(bombing_cell_row,bombing_cell_column));
         }
         else
         if(attacking_cell_column!=-1 and attacking_cell_row!=-1) {
