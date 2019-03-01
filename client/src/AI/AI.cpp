@@ -258,6 +258,9 @@ Cell findClosestCell(World *world, int ID)
             }
         }
     }
+    cout<<"********* ID is "<< ID <<"   minrow is :"<< minrow <<endl;
+    cout<<"********* ID is "<< ID <<"   mincol is :"<< mincol <<endl;
+
     return cellLocator(world ,minrow ,mincol);
 }
 
@@ -432,7 +435,7 @@ void AI::move(World *world) {
             {
                 isHealer = 1;
             }
-            else if (!my_heros[i]->getCurrentCell().isInObjectiveZone() and !isHealer )
+            if (!my_heros[i]->getCurrentCell().isInObjectiveZone() and !isHealer )
             {
                 Cell targetCell = findClosestCell(world, my_heros[i]->getId());
                 targetCellRow[i]    = targetCell.getRow();
@@ -441,7 +444,7 @@ void AI::move(World *world) {
                 // <my_heros[i]->getCurrentCell().getRow() <<" j: "<<my_heros[i]->getCurrentCell().getColumn()<< "is i:
                 // "<<targetCellRow[i] << "j:"<<targetCellColumn[i]<< endl;
             }
-            else if( my_heros[i]->getCurrentCell().isInObjectiveZone() and !isHealer)
+            if( my_heros[i]->getCurrentCell().isInObjectiveZone() and !isHealer)
             {
                 if(opp_heros.size()>=i)
                 {
@@ -459,7 +462,7 @@ void AI::move(World *world) {
                     targetCellColumn[i]=opp_heros[i-2]->getCurrentCell().getColumn();
                 }
             }
-            else if(isHealer)
+            if(isHealer)
             {
                 Cell target_heal_cell_move = Cell::NULL_CELL;
                 int lostHealth = 0;
