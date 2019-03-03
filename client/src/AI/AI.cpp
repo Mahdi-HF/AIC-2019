@@ -5,18 +5,14 @@ using namespace std;
 int RowNum = 31;
 int ColumnNum = 31;
 
-bool WAR_IN_OBJECTIVE_ZONE = true;
 
 int mapAnalyse[35][35];
-int SENTRY_ID=-1;
+int BLASTER_ID_4=-1;
 int BLASTER_ID=-1;
 int BLASTER_ID_2=-1;
 int BLASTER_ID_3=-1;
 
-Cell SENTRY_CELL;
-Cell BLASTER_CELL;
-Cell BLASTER_CELL_2;
-Cell BLASTER_CELL_3;
+
 
 int HERO_mapAnalyse[35][35];
 
@@ -116,31 +112,30 @@ void mapAnalysingByHeroesView(World *world)
         }
     }
 }
-
 void HeroAnalyse(World *world)
 {
-        for (int n = 0; n < 4; n++)
+    for (int n = 0; n < 4; n++)
+    {
+        if (HeroName::BLASTER == world->getMyHeroes()[n]->getName())
         {
-            if (HeroName::SENTRY == world->getMyHeroes()[n]->getName())
+            if(BLASTER_ID != -1)
             {
-                SENTRY_ID = world->getMyHeroes()[n]->getId();
+                BLASTER_ID = world->getMyHeroes()[n]->getId();
             }
-            else if (HeroName::BLASTER == world->getMyHeroes()[n]->getName())
+            else if(BLASTER_ID_2 !=-1)
             {
-                if(BLASTER_ID != -1)
-                {
-                    BLASTER_ID = world->getMyHeroes()[n]->getId();
-                }
-                else if(BLASTER_ID_2 !=-1)
-                {
-                    BLASTER_ID_2 = world->getMyHeroes()[n]->getId();
-                }
-                else if(BLASTER_ID_3 !=-1)
-                {
-                    BLASTER_ID_3 = world->getMyHeroes()[n]->getId();
-                }
+                BLASTER_ID_2 = world->getMyHeroes()[n]->getId();
+            }
+            else if(BLASTER_ID_3 !=-1)
+            {
+                BLASTER_ID_3 = world->getMyHeroes()[n]->getId();
+            }
+            else if(BLASTER_ID_4!=-1)
+            {
+                BLASTER_ID_4 = world->getMyHeroes()[n]->getId();
             }
         }
+    }
 }
 /*Cell ColsestOBJZONE(World *world ,int Id)
 {
@@ -209,20 +204,18 @@ void mapAnalyser(World *world)
         }
     }
 }
-
 Cell heroLocator(World *world, int ID)
 {
     return world->getHero(ID).getCurrentCell();
 }
-
 Cell cellLocator(World *world, int i, int j)
 {
     return world->map().getCell(i, j);
 }
 bool checknextmove(World *world , int Id)
 {
-Cell C=world->getHero(Id).getCurrentCell();
-bool res=false;
+    Cell C=world->getHero(Id).getCurrentCell();
+    bool res=false;
     for (int i = -1; i <=1 ; ++i) {
         for (int j = -1; j <= 1; ++j) {
             if(!(world->map().getCell(C.getRow()+i,C.getColumn())==Cell::NULL_CELL))
@@ -232,11 +225,9 @@ bool res=false;
     }
     return res;
 }
-
 Cell findClosestCell(World *world, int ID)
 {
     minDistance = 1000;
-    Cell firstStep = Cell::NULL_CELL ;
     int minrow = -1;
     int mincol = -1;
     int len=0;
@@ -245,11 +236,10 @@ Cell findClosestCell(World *world, int ID)
     {
         for (int j = 0; j < 31; ++j)
         {
-            if( Isempty(world , i , j) and cellLocator(world,i,j).isInObjectiveZone() )
+            if(Isempty(world , i , j) and cellLocator(world,i,j).isInObjectiveZone())
             {
-                firstStep = world->getPathMoveDirections(world->getHero(ID).getCurrentCell().getRow(), world->getHero(ID).getCurrentCell().getColumn(), i, j)[0];
                 len = world->manhattanDistance( heroLocator(world,ID), cellLocator(world,i,j) );
-                if( Isempty(world,firstStep.getRow(),firstStep.getColumn()) and len <= minDistance )
+                if(len <= minDistance)
                 {
                     minDistance = len;
                     minrow = i;
@@ -258,13 +248,9 @@ Cell findClosestCell(World *world, int ID)
             }
         }
     }
-    cout<<"********* ID is "<< ID <<"   minrow is :"<< minrow <<endl;
-    cout<<"********* ID is "<< ID <<"   mincol is :"<< mincol <<endl;
-
     return cellLocator(world ,minrow ,mincol);
 }
-
-void moveToCell(World *world , int ID )
+void moveToCell(World *world , int ID )  // TODO sometimes their direction is closed by another hero and their do nothing !
 {
     findClosestCell(world , ID );  //changes minDistance and minI and minJ
     Mypath.clear();
@@ -317,28 +303,28 @@ void BlasterAbilityDone(World *world , int ID , AbilityName firstAbilityName , A
     int jend=jstart+10;
 
     for (int i=istart; i <=iend ; i++) {
-                for (int j = jstart; j <= jend ; j++) {
-                    if (world->getHero(ID).getAbility(firstAbilityName).getCooldown() == 0 and
-                        world->map().getCell(i, j).isInVision() and HERO_mapAnalyse[i][j] > 1 and
-                            world->manhattanDistance(heroLocator(world, ID), cellLocator(world, i, j)) >=1 )
-                    {
-                        if(cellLocator(world,i,j).isWall())
-                            world->castAbility(world->getHero(ID),world->getHero(ID).getAbility(firstAbilityName),cellLocator(world, i, j+1));
-                        else
-                        world->castAbility(world->getHero(ID),world->getHero(ID).getAbility(firstAbilityName),cellLocator(world, i, j));
-                        break;
-                    }
-                    if (world->getHero(ID).getAbility(secondAbilityName).getCooldown() == 0 and(mapAnalyse[i][j] != -1) and
-                        world->map().getCell(i, j).isInVision() and HERO_mapAnalyse[i][j] > 1 and
-                        world->manhattanDistance(heroLocator(world, ID), cellLocator(world, i, j)) <= 4)
-                    {
-                        world->castAbility(world->getHero(ID), world->getHero(ID).getAbility(secondAbilityName), cellLocator(world, i, j));
-                        break;
-                    }
-                }
+        for (int j = jstart; j <= jend ; j++) {
+            if (world->getHero(ID).getAbility(firstAbilityName).getCooldown() == 0 and
+                world->map().getCell(i, j).isInVision() and HERO_mapAnalyse[i][j] > 1 and
+                world->manhattanDistance(heroLocator(world, ID), cellLocator(world, i, j)) >=1 )
+            {
+                if(cellLocator(world,i,j).isWall())
+                    world->castAbility(world->getHero(ID),world->getHero(ID).getAbility(firstAbilityName),cellLocator(world, i, j+1));
+                else
+                    world->castAbility(world->getHero(ID),world->getHero(ID).getAbility(firstAbilityName),cellLocator(world, i, j));
+                break;
             }
-
+            if (world->getHero(ID).getAbility(secondAbilityName).getCooldown() == 0 and(mapAnalyse[i][j] != -1) and
+                world->map().getCell(i, j).isInVision() and HERO_mapAnalyse[i][j] > 1 and
+                world->manhattanDistance(heroLocator(world, ID), cellLocator(world, i, j)) <= 4)
+            {
+                world->castAbility(world->getHero(ID), world->getHero(ID).getAbility(secondAbilityName), cellLocator(world, i, j));
+                break;
+            }
+        }
     }
+
+}
 Cell inrange(World *world,int Id)
 {
     vector<Hero *> opheros = world->getOppHeroes();
@@ -361,7 +347,7 @@ Cell minrange(World *world,int Id)
         if(world->manhattanDistance(world->getHero(Id).getCurrentCell(),opheros[i]->getCurrentCell())<len)
         {
             len=world->manhattanDistance(world->getHero(Id).getCurrentCell(),opheros[i]->getCurrentCell());
-        AIM=opheros[i]->getCurrentCell();
+            AIM=opheros[i]->getCurrentCell();
         }
     }
     return AIM;
@@ -405,242 +391,159 @@ void AI::pick(World *world)
 
     switch (cnt)
     {
-    case 0:
-        world->pickHero(HeroName::BLASTER);
-        break;
-    case 1:
-        world->pickHero(HeroName::BLASTER);
-        break;
-    case 2:
-        world->pickHero(HeroName::BLASTER);
-        break;
-    case 3:
-        world->pickHero(HeroName::HEALER);
-        break;
-    default:
-        world->pickHero(HeroName::BLASTER);
+        case 0:
+            world->pickHero(HeroName::BLASTER);
+            break;
+        case 1:
+            world->pickHero(HeroName::BLASTER);
+            break;
+        case 2:
+            world->pickHero(HeroName::BLASTER);
+            break;
+        case 3:
+            world->pickHero(HeroName::GUARDIAN);
+            break;
+        default:
+            world->pickHero(HeroName::BLASTER);
     }
     cnt++;
 }
 //----------------------------------------- Move -----------------------------------------------------------------------
 void AI::move(World *world) {
+    Cell lastcellofG=Cell::NULL_CELL;
     cerr << "-move" << endl;
     vector<Hero *> my_heros = world->getMyHeroes();
     vector<Hero *> opp_heros = world->getOppHeroes();
-    int isHealer = 0;
-
+    std::vector<Cell *> objzone = world->map().getObjectiveZone();
     for (int i = 0; i < 4; ++i)
+    {
+        if (!my_heros[i]->getCurrentCell().isInObjectiveZone())
         {
-            if(my_heros[i]->getName() == HeroName::HEALER )
+            Cell targetCell = findClosestCell(world, my_heros[i]->getId());
+            targetCellRow[i]    = targetCell.getRow();
+            targetCellColumn[i] = targetCell.getColumn();
+        }
+        else
+        {
+            if(my_heros[i]->getName()==GUARDIAN)
             {
-                isHealer = 1;
-            }
-            if (!my_heros[i]->getCurrentCell().isInObjectiveZone() and !isHealer )
-            {
-                Cell targetCell = findClosestCell(world, my_heros[i]->getId());
-                targetCellRow[i]    = targetCell.getRow();
-                targetCellColumn[i] = targetCell.getColumn();
-                //cerr << "the hero is not in OBJZONE and the target for hero with place i:"<
-                // <my_heros[i]->getCurrentCell().getRow() <<" j: "<<my_heros[i]->getCurrentCell().getColumn()<< "is i:
-                // "<<targetCellRow[i] << "j:"<<targetCellColumn[i]<< endl;
-            }
-            if( my_heros[i]->getCurrentCell().isInObjectiveZone() and !isHealer)
-            {
-                if(opp_heros.size()>=i)
-                {
-                    targetCellRow[i]=opp_heros[i]->getCurrentCell().getRow();
-                    targetCellColumn[i]=opp_heros[i]->getCurrentCell().getColumn();
-                }
-                else if(opp_heros.size()>=i-1)
-                {
-                    targetCellRow[i]=opp_heros[i-1]->getCurrentCell().getRow();
-                    targetCellColumn[i]=opp_heros[i-1]->getCurrentCell().getColumn();
-                }
-                else if(opp_heros.size()>=i-2)
-                {
-                    targetCellRow[i]=opp_heros[i-2]->getCurrentCell().getRow();
-                    targetCellColumn[i]=opp_heros[i-2]->getCurrentCell().getColumn();
-                }
-            }
-            if(isHealer)
-            {
-                Cell target_heal_cell_move = Cell::NULL_CELL;
-                int lostHealth = 0;
-                for (Hero *_hero : world->getMyHeroes() )
-                {
-                    if ( lostHealth <= ( _hero->getMaxHP() - _hero->getCurrentHP() ) and _hero->getRemRespawnTime() == 0 )
+                int nearest=20,res=0;
+                for (int j = 0; j <4 ; ++j) {
+                    if (world->manhattanDistance(my_heros[i]->getCurrentCell(),opp_heros[j]->getCurrentCell())<nearest)
                     {
-                        lostHealth = _hero->getMaxHP() - _hero->getCurrentHP() ;
-                        target_heal_cell_move = _hero->getCurrentCell();
+                        nearest=world->manhattanDistance(my_heros[i]->getCurrentCell(),opp_heros[j]->getCurrentCell());
+                        res=j;
                     }
                 }
-                if (target_heal_cell_move != Cell::NULL_CELL)
+                targetCellRow[i]=opp_heros[res]->getCurrentCell().getRow();
+                targetCellColumn[i]=opp_heros[res]->getCurrentCell().getColumn();
+            }
+            else
+            {
+                if(i==0)
                 {
-                    Cell target_heal_cell_move_near = Cell::NULL_CELL;
-                    [&] {
-                        for (int j = -1 ; j < 2 ; ++j)
-                        {
-                            for (int k = -1 ; k < 2 ; ++k)
-                            {
-                                int x = target_heal_cell_move.getRow() + j ;
-                                int y = target_heal_cell_move.getRow() + k ;
-                                target_heal_cell_move_near = world->map().getCell( x , y );
-                                if( !target_heal_cell_move_near.isWall() and Isempty(world,x,y) )
-                                {
-                                    targetCellRow[i] = target_heal_cell_move_near.getRow() ;
-                                    targetCellColumn[i] = target_heal_cell_move_near.getColumn() ;
-                                    return;
-                                }
-                            }
-                        }
-                    }();
+                    targetCellRow[i]=objzone[(objzone.size()/2)-1]->getRow();
+                    targetCellColumn[i]=objzone[(objzone.size()/2)-1]->getColumn()+4;
+                }
+                else if (i==1)
+                {
+                    targetCellRow[i]=objzone[(objzone.size()/2)-1]->getRow()+2;
+                    targetCellColumn[i]=objzone[(objzone.size()/2)-1]->getColumn()+1;
+                }
+                else if(i==2)
+                {
+                    targetCellRow[i]=objzone[(objzone.size()/2)-1]->getRow();
+                    targetCellColumn[i]=objzone[(objzone.size()/2)-1]->getColumn()-2;
+                }
+                else if(i==3)
+                {
+                    targetCellRow[i]=objzone[(objzone.size()/2)-1]->getRow();
+                    targetCellColumn[i]=objzone[(objzone.size()/2)-1]->getColumn()+3;
                 }
             }
         }
+    }
+    for (int i = 0; i < 4 ; ++i)
+    {
+        vector<Direction> _dirs = world->getPathMoveDirections(my_heros[i]->getCurrentCell().getRow(),
+                                                               my_heros[i]->getCurrentCell().getColumn(),
+                                                               targetCellRow[i],targetCellColumn[i]);
 
-        for (int i = 0; i < 4 ; ++i)
-        {
-            //cerr<<"the target to move is"<<targetCellRow[i]<<"and :"<<targetCellColumn[i]<<"and canmove is"<<canmove[i]<<endl;
-            vector<Direction> _dirs = world->getPathMoveDirections(my_heros[i]->getCurrentCell().getRow(), my_heros[i]->getCurrentCell().getColumn(),
-                                                                   targetCellRow[i] , targetCellColumn[i]);
-            //cerr<<"the target to move is"<<targetCellRow[i]<<"and :"<<targetCellColumn[i]<<endl;
-            if ((_dirs.size() != 0 and !my_heros[i]->getCurrentCell().isInObjectiveZone()) or (_dirs.size()!=0 and world->getAP()>80))
-                //ALWAYS check if there is a path to that target!!!!
+        if ((_dirs.size() != 0 and !my_heros[i]->getCurrentCell().isInObjectiveZone()) or (_dirs.size()!=0 and world->getAP()>80))
+            if(my_heros[i]->getName()==GUARDIAN and lastcellofG.getRow()==targetCellRow[i] and lastcellofG.getColumn()==targetCellColumn[i])
+                world->moveHero(my_heros[i]->getId(),_dirs[1]);
+            else
                 world->moveHero(my_heros[i]->getId(),_dirs[0]);
-               // cerr<<"trying to move and nomove is: "<<nomove<<endl;
-
+        if(my_heros[i]->getName()==GUARDIAN)
+        {
+            lastcellofG=cellLocator(world,targetCellRow[i],targetCellColumn[i]);
         }
+    }
 }
 
 //----------------------------------------- Action ---------------------------------------------------------------------
-void AI::action(World *world)
-{
+void AI::action(World *world) {
     HeroAnalyse(world);
-//    cerr<<"B ID1 = "<<BLASTER_ID<<"B ID2 = "<<BLASTER_ID_2<<"B ID1 = "<<BLASTER_ID_3<<"SEnt ID: "<<SENTRY_ID<<endl;
-//    printMap(world);
+    int attack_cell_guardian_row = -1;
+    int attack_cell_guardian_column = -1;
     cerr << "-action" << endl;
-for (Hero *my_hero : world->getMyHeroes())
-{
-    if (my_hero->getName() == HeroName::BLASTER)
-    {
-        //Find the closest bombing target
-        int bombing_cell_row = -1;
-        int bombing_cell_column=-1;
-        int middle_cell_row= -1;
-        int middle_cell_column= -1;
-        int attacking_cell_row=-1;
-        int attacking_cell_column=-1;
-        int min_dist = 10000;
-        for (int k = 0; k < 4; ++k)
-        {
-            if (world->manhattanDistance(my_hero->getCurrentCell(),world->getOppHeroes()[k]->getCurrentCell())<=4)
-            {
-                attacking_cell_column=world->getOppHeroes()[k]->getCurrentCell().getColumn();
-                attacking_cell_row=world->getOppHeroes()[k]->getCurrentCell().getRow();
+    for (Hero *my_hero : world->getMyHeroes()) {
+        if (my_hero->getName() == HeroName::BLASTER) {
+            int bombing_cell_row = -1;
+            int bombing_cell_column = -1;
+            int attacking_cell_row = -1;
+            int attacking_cell_column = -1;
+            for (int k = 0; k < 4; ++k) {
+                if (world->manhattanDistance(my_hero->getCurrentCell(), world->getOppHeroes()[k]->getCurrentCell()) <=
+                    5 and my_hero->getAbilities()[2]->getRemCooldown()==0) {
+                    bombing_cell_column = world->getOppHeroes()[k]->getCurrentCell().getColumn();
+                    bombing_cell_row = world->getOppHeroes()[k]->getCurrentCell().getRow();
+                }
+                if (world->manhattanDistance(my_hero->getCurrentCell(), world->getOppHeroes()[k]->getCurrentCell()) <=
+                    4) {
+                    attacking_cell_column = world->getOppHeroes()[k]->getCurrentCell().getColumn();
+                    attacking_cell_row = world->getOppHeroes()[k]->getCurrentCell().getRow();
+                }
             }
-            if (world->manhattanDistance(my_hero->getCurrentCell(),world->getOppHeroes()[k]->getCurrentCell())==5)
-            {
-                bombing_cell_column=world->getOppHeroes()[k]->getCurrentCell().getColumn();
-                bombing_cell_row=world->getOppHeroes()[k]->getCurrentCell().getRow();
-                
+            if (my_hero->getCurrentHP() <= 100) {
+                world->castAbility(my_hero->getId(), BLASTER_DODGE, my_hero->getCurrentCell().getRow() - 2,
+                                   my_hero->getCurrentCell().getColumn() - 2);
             }
-        }
-        if(bombing_cell_column!=-1&&bombing_cell_row!=-1) {
-            cerr<<"The BlasterBOmb is doing... \n ";
-            world->castAbility(*my_hero, AbilityName::BLASTER_BOMB,world->map().getCell(bombing_cell_row,bombing_cell_column));
+            if (bombing_cell_column != -1 && bombing_cell_row != -1) {
+                cerr << "The BlasterBOMB is doing... \n ";
+                world->castAbility(*my_hero, AbilityName::BLASTER_BOMB,
+                                   world->map().getCell(bombing_cell_row, bombing_cell_column));
+            }
+            if (attacking_cell_column != -1 and attacking_cell_row != -1) {
+                world->castAbility(*my_hero, AbilityName::BLASTER_ATTACK,
+                                   world->map().getCell(attacking_cell_row, attacking_cell_column));
+                cerr << "The BlasterAttack is doing... \n ";
+            }
         }
         else
-        if(attacking_cell_column!=-1 and attacking_cell_row!=-1) {
-            world->castAbility(*my_hero, AbilityName::BLASTER_ATTACK,world->map().getCell(attacking_cell_row,attacking_cell_column));
-            cerr<<"The BlasterAttack is doing... \n ";
-        }
-        /*
-            for (int i = 0; i < 4; ++i) {
-                for (int j = i+1; j < 4; ++j) {
-                    if (((world->getOppHeroes()[i]->getCurrentCell().getColumn()-world->getOppHeroes()[j]->getCurrentCell().getColumn())+
-                    (world->getOppHeroes()[i]->getCurrentCell().getRow()-world->getOppHeroes()[j]->getCurrentCell().getRow()))/2<5)
-                    {
-                        middle_cell_column=(world->getOppHeroes()[i]->getCurrentCell().getColumn()-world->getOppHeroes()[j]->getCurrentCell().getColumn())/2;
-                        middle_cell_row=(world->getOppHeroes()[i]->getCurrentCell().getRow()-world->getOppHeroes()[j]->getCurrentCell().getRow())/2;
-                    }
-                }
-            }
-            //Perform the bombing
-            if(middle_cell_column!=-1 and middle_cell_row!=-1)
-            {
-                world->castAbility(my_hero->getId(),BLASTER_BOMB,world->map().getCell(middle_cell_row,middle_cell_column));
-                cerr<<"middle cell attack is don";
-            }
-            */
-    }
-
-    else if (my_hero->getName() == HeroName::SENTRY)
-    {
-        //Find the closest shooting target
-        Cell shoot_cell = Cell::NULL_CELL;
-        int min_dist = 10000;
-        for (Hero *opp_hero : world->getOppHeroes())
         {
-            if (opp_hero->getCurrentCell().isInVision()) //if hero is seen
+            for (int k = 0; k < 4; ++k)
             {
-                if (min_dist > world->manhattanDistance(opp_hero->getCurrentCell(), my_hero->getCurrentCell()))
+                if (world->manhattanDistance(my_hero->getCurrentCell(), world->getOppHeroes()[k]->getCurrentCell()) <= 1)
                 {
-                    min_dist = world->manhattanDistance(opp_hero->getCurrentCell(), my_hero->getCurrentCell());
-                    shoot_cell = opp_hero->getCurrentCell();
+                    attack_cell_guardian_column = world->getOppHeroes()[k]->getCurrentCell().getColumn();
+                    attack_cell_guardian_row = world->getOppHeroes()[k]->getCurrentCell().getRow();
                 }
             }
-        }
-        //Perform the shooting
-        if (shoot_cell != Cell::NULL_CELL)
-        {
-            world->castAbility(*my_hero, AbilityName::SENTRY_RAY, shoot_cell);
-        }
-    }
 
-    else if (my_hero->getName() == HeroName::HEALER)
-    {
-        //Find the closest healing target
-        Cell target_heal_cell = Cell::NULL_CELL;
-//        int min_dist = 10000;
-        int lostHealth = 0;
-        for (Hero *_hero : world->getMyHeroes() )
+        }
+        if (attack_cell_guardian_column!=-1 and attack_cell_guardian_row!=-1)
         {
-            if ( lostHealth < ( _hero->getMaxHP() - _hero->getCurrentHP() ) and
-                _hero->getRemRespawnTime() == 0 and _hero->getCurrentHP() != _hero->getMaxHP() and
-                world->manhattanDistance( _hero->getCurrentCell() , my_hero->getCurrentCell() ) <= 4 )
-                //min_dist > world->manhattanDistance(_hero->getCurrentCell(), my_hero->getCurrentCell())
+            world->castAbility(my_hero->getId(),GUARDIAN_ATTACK,attack_cell_guardian_row,attack_cell_guardian_column);
+            cerr<<"Guard attack"<<endl;
+        }
+        for (int i = 0; i < 4; ++i)
+        {
+            if(world->getMyHeroes()[i]->getCurrentHP()<=150 and world->manhattanDistance(my_hero->getCurrentCell(),world->getMyHeroes()[i]->getCurrentCell())<=4 and my_hero->getAbilities()[2]->getRemCooldown() ==0)
             {
-//                min_dist = world->manhattanDistance(_hero->getCurrentCell(), my_hero->getCurrentCell() );
-                lostHealth = _hero->getMaxHP() - _hero->getCurrentHP() ;
-                target_heal_cell = _hero->getCurrentCell();
+                world->castAbility(my_hero->getId(),GUARDIAN_FORTIFY,world->getMyHeroes()[i]->getCurrentCell().getRow(),world->getMyHeroes()[i]->getCurrentCell().getColumn());
+                cerr<<"G FORITY"<<endl;
             }
         }
-        //Do the attack
-        if (target_heal_cell != Cell::NULL_CELL)
-        {
-            world->castAbility(*my_hero, AbilityName::HEALER_HEAL, target_heal_cell);
-        }
-        Cell attack_cell = Cell::NULL_CELL;
-        int min_dist2 = 5;
-        for (Hero *opp_hero : world->getOppHeroes())
-        {
-            if (opp_hero->getCurrentCell().isInVision()) //if hero is seen
-            {
-                if (min_dist2 > world->manhattanDistance(opp_hero->getCurrentCell(), my_hero->getCurrentCell()))
-                {
-                    min_dist2 = world->manhattanDistance(opp_hero->getCurrentCell(), my_hero->getCurrentCell());
-                    attack_cell = opp_hero->getCurrentCell();
-                }
-            }
-        }
-        //Perform the attack
-        if (attack_cell != Cell::NULL_CELL)
-        {
-            world->castAbility(*my_hero, AbilityName::HEALER_ATTACK, attack_cell);
-        }
     }
-}
-
-// printMap(world);
-
 }
